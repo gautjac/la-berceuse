@@ -1,0 +1,5 @@
+/* La Berceuse — system strings (English). Shown by iOS in the HealthKit
+   permission dialogs. */
+"CFBundleDisplayName" = "La Berceuse";
+"NSHealthShareUsageDescription" = "La Berceuse reads last night's sleep so it can greet you with a gentle word in the morning.";
+"NSHealthUpdateUsageDescription" = "La Berceuse logs your wind-down rituals to Health as mindful time before sleep.";

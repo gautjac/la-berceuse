@@ -1,0 +1,606 @@
+// !$*UTF8*$!
+{
+	archiveVersion = 1;
+	classes = {
+	};
+	objectVersion = 77;
+	objects = {
+
+/* Begin PBXBuildFile section */
+		0A4253400FB522D4173C20E6 /* CognitiveShuffle.swift in Sources */ = {isa = PBXBuildFile; fileRef = B17AD76D43A5EE2E91BB9BBF /* CognitiveShuffle.swift */; };
+		167F1440E66D41EE5D5576A9 /* BreathView.swift in Sources */ = {isa = PBXBuildFile; fileRef = F0A71272D67979292A3E990C /* BreathView.swift */; };
+		1D4B0B72BE875E91A7F6DC4E /* Narrator.swift in Sources */ = {isa = PBXBuildFile; fileRef = 509838676419C07CA82234CA /* Narrator.swift */; };
+		1F02BC3C9ABC440227BAB7F2 /* SleepHealth.swift in Sources */ = {isa = PBXBuildFile; fileRef = F00EBBA3712634F0D57E8953 /* SleepHealth.swift */; };
+		1F326AE1885C73562747C22C /* DemoSeed.swift in Sources */ = {isa = PBXBuildFile; fileRef = C17B1C923DCD6E3677D2CEFE /* DemoSeed.swift */; };
+		22BD73B56B4E8A50F13E4D11 /* HomeView.swift in Sources */ = {isa = PBXBuildFile; fileRef = EC2B9245067DBAAC8797ED05 /* HomeView.swift */; };
+		27F15FB4BCBF0F468FDE7705 /* Soundscape.swift in Sources */ = {isa = PBXBuildFile; fileRef = B8A9A0089CFF97B75F8C426E /* Soundscape.swift */; };
+		28CB46BB2D3B655252F79172 /* NightSky.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0EC93162C25DDA3963080C9B /* NightSky.swift */; };
+		2DE1E425D294D24143CCE976 /* SettingsView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7CC0E799C296D36707039CED /* SettingsView.swift */; };
+		40A4C0A3F67BEB086C8673B3 /* Theme.swift in Sources */ = {isa = PBXBuildFile; fileRef = 753A6DE7F352B867975F5420 /* Theme.swift */; };
+		446010459CEBFE74497B0F51 /* ShuffleView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3E554132910D5357EA2CAB2C /* ShuffleView.swift */; };
+		52FAF1F0AD105243041B4D69 /* LaBerceuseApp.swift in Sources */ = {isa = PBXBuildFile; fileRef = BDCB37B5D76BB88DA85EF87C /* LaBerceuseApp.swift */; };
+		5C7C1A6066051243803068EA /* NidraView.swift in Sources */ = {isa = PBXBuildFile; fileRef = AB896594EB091512D1FD4439 /* NidraView.swift */; };
+		5CA2EC098AA072F23EE62E11 /* Haptics.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4DFBFA83AD235AC77716F7EC /* Haptics.swift */; };
+		61D628716CDDCFB4B51C5CB1 /* SoundscapeView.swift in Sources */ = {isa = PBXBuildFile; fileRef = D80F007243F2A22C9B74DB57 /* SoundscapeView.swift */; };
+		66D79EF0261170024CCBD653 /* RootView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 570B63058EA711A6CFF53F42 /* RootView.swift */; };
+		68E4302861FB437DA5DEBDD5 /* SleepTimerController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 92F8FAFDA1B545B2A11B90D1 /* SleepTimerController.swift */; };
+		69FF5D343A7F7E5FC96E2F9C /* Loc.swift in Sources */ = {isa = PBXBuildFile; fileRef = A1D8BF2714DF3A22AA3E204A /* Loc.swift */; };
+		869CF1917900E2BBE725B8E6 /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 45C03A54B22538E4A1DE103C /* Assets.xcassets */; };
+		9E80DB62FFD1D670BB17741F /* SoundEngine.swift in Sources */ = {isa = PBXBuildFile; fileRef = 94F54748520754DCCC2DDAD5 /* SoundEngine.swift */; };
+		A8E486DD7855226276774915 /* LaBerceuseTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 50C9522DF403924C37826308 /* LaBerceuseTests.swift */; };
+		ACEA0E5D957BE6796735CA53 /* InfoPlist.strings in Resources */ = {isa = PBXBuildFile; fileRef = F4AEBB6AE2310E5C4EA7B674 /* InfoPlist.strings */; };
+		AECD2236053E6A7669A70290 /* TimerSheet.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0157D62245947E5DF9FE4054 /* TimerSheet.swift */; };
+		BC3CD619984AA695AB388C28 /* Persistence.swift in Sources */ = {isa = PBXBuildFile; fileRef = B713902942C4844C31C7B66F /* Persistence.swift */; };
+		C5BB2E731724474EBE2EAFF2 /* BreathPattern.swift in Sources */ = {isa = PBXBuildFile; fileRef = ABD2FF4CDE00FA4D50787130 /* BreathPattern.swift */; };
+		F693093A3F51C8EC0C4784B6 /* NidraScript.swift in Sources */ = {isa = PBXBuildFile; fileRef = 250FB9099833C7D0F6304BAE /* NidraScript.swift */; };
+/* End PBXBuildFile section */
+
+/* Begin PBXContainerItemProxy section */
+		E41B0D6A0485898CFE235310 /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = 6C1316CBFB23EC9A64755E53 /* Project object */;
+			proxyType = 1;
+			remoteGlobalIDString = 90FC1FCA56D067DF334239C2;
+			remoteInfo = LaBerceuse;
+		};
+/* End PBXContainerItemProxy section */
+
+/* Begin PBXFileReference section */
+		0157D62245947E5DF9FE4054 /* TimerSheet.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TimerSheet.swift; sourceTree = "<group>"; };
+		0EC93162C25DDA3963080C9B /* NightSky.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NightSky.swift; sourceTree = "<group>"; };
+		250FB9099833C7D0F6304BAE /* NidraScript.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NidraScript.swift; sourceTree = "<group>"; };
+		3E554132910D5357EA2CAB2C /* ShuffleView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ShuffleView.swift; sourceTree = "<group>"; };
+		45C03A54B22538E4A1DE103C /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
+		4DFBFA83AD235AC77716F7EC /* Haptics.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Haptics.swift; sourceTree = "<group>"; };
+		509838676419C07CA82234CA /* Narrator.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Narrator.swift; sourceTree = "<group>"; };
+		50C9522DF403924C37826308 /* LaBerceuseTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LaBerceuseTests.swift; sourceTree = "<group>"; };
+		519E5B6100235E9384E3AA7E /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist; path = Info.plist; sourceTree = "<group>"; };
+		570B63058EA711A6CFF53F42 /* RootView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RootView.swift; sourceTree = "<group>"; };
+		753A6DE7F352B867975F5420 /* Theme.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Theme.swift; sourceTree = "<group>"; };
+		7CC0E799C296D36707039CED /* SettingsView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SettingsView.swift; sourceTree = "<group>"; };
+		8945681337059FDF77A05662 /* LaBerceuseTests.xctest */ = {isa = PBXFileReference; includeInIndex = 0; lastKnownFileType = wrapper.cfbundle; path = LaBerceuseTests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
+		92F8FAFDA1B545B2A11B90D1 /* SleepTimerController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SleepTimerController.swift; sourceTree = "<group>"; };
+		93039552F02C8E372B35C422 /* LaBerceuse.entitlements */ = {isa = PBXFileReference; lastKnownFileType = text.plist.entitlements; path = LaBerceuse.entitlements; sourceTree = "<group>"; };
+		94F54748520754DCCC2DDAD5 /* SoundEngine.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SoundEngine.swift; sourceTree = "<group>"; };
+		A1D8BF2714DF3A22AA3E204A /* Loc.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Loc.swift; sourceTree = "<group>"; };
+		AB896594EB091512D1FD4439 /* NidraView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NidraView.swift; sourceTree = "<group>"; };
+		ABD2FF4CDE00FA4D50787130 /* BreathPattern.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BreathPattern.swift; sourceTree = "<group>"; };
+		B17AD76D43A5EE2E91BB9BBF /* CognitiveShuffle.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CognitiveShuffle.swift; sourceTree = "<group>"; };
+		B713902942C4844C31C7B66F /* Persistence.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Persistence.swift; sourceTree = "<group>"; };
+		B8A9A0089CFF97B75F8C426E /* Soundscape.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Soundscape.swift; sourceTree = "<group>"; };
+		BDCB37B5D76BB88DA85EF87C /* LaBerceuseApp.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LaBerceuseApp.swift; sourceTree = "<group>"; };
+		C17B1C923DCD6E3677D2CEFE /* DemoSeed.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DemoSeed.swift; sourceTree = "<group>"; };
+		C558752E907389FA7FA9110E /* LaBerceuse.app */ = {isa = PBXFileReference; includeInIndex = 0; lastKnownFileType = wrapper.application; path = LaBerceuse.app; sourceTree = BUILT_PRODUCTS_DIR; };
+		CE7CD1A4DD2D8BD679EFA024 /* en */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = en; path = en.lproj/InfoPlist.strings; sourceTree = "<group>"; };
+		D49EAFD4B6F749C018AB6A8D /* fr */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = fr; path = fr.lproj/InfoPlist.strings; sourceTree = "<group>"; };
+		D80F007243F2A22C9B74DB57 /* SoundscapeView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SoundscapeView.swift; sourceTree = "<group>"; };
+		EC2B9245067DBAAC8797ED05 /* HomeView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HomeView.swift; sourceTree = "<group>"; };
+		F00EBBA3712634F0D57E8953 /* SleepHealth.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SleepHealth.swift; sourceTree = "<group>"; };
+		F0A71272D67979292A3E990C /* BreathView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BreathView.swift; sourceTree = "<group>"; };
+/* End PBXFileReference section */
+
+/* Begin PBXGroup section */
+		2EBD18FA0AC9BEFF19ECC3CF /* Resources */ = {
+			isa = PBXGroup;
+			children = (
+				45C03A54B22538E4A1DE103C /* Assets.xcassets */,
+			);
+			path = Resources;
+			sourceTree = "<group>";
+		};
+		48047E00F23E07A133989D7F /* Speech */ = {
+			isa = PBXGroup;
+			children = (
+				509838676419C07CA82234CA /* Narrator.swift */,
+			);
+			path = Speech;
+			sourceTree = "<group>";
+		};
+		4E125EE6B50C84D5A897CC5B /* Tests */ = {
+			isa = PBXGroup;
+			children = (
+				50C9522DF403924C37826308 /* LaBerceuseTests.swift */,
+			);
+			path = Tests;
+			sourceTree = "<group>";
+		};
+		4F17B9206758E41447268204 /* Products */ = {
+			isa = PBXGroup;
+			children = (
+				C558752E907389FA7FA9110E /* LaBerceuse.app */,
+				8945681337059FDF77A05662 /* LaBerceuseTests.xctest */,
+			);
+			name = Products;
+			sourceTree = "<group>";
+		};
+		5E036C6913A05A4FDC91F38B /* Sources */ = {
+			isa = PBXGroup;
+			children = (
+				BDCB37B5D76BB88DA85EF87C /* LaBerceuseApp.swift */,
+				C1005E5E68D3ABCF6095FBAF /* Audio */,
+				8673D9EFDD2D0E778404711A /* Health */,
+				652750232C4D33DEF4B612E7 /* Models */,
+				48047E00F23E07A133989D7F /* Speech */,
+				8F5C2D49FFD79A0C2D96C8DE /* Util */,
+				C3F0AD49DD3895A623FA496C /* Views */,
+			);
+			path = Sources;
+			sourceTree = "<group>";
+		};
+		652750232C4D33DEF4B612E7 /* Models */ = {
+			isa = PBXGroup;
+			children = (
+				ABD2FF4CDE00FA4D50787130 /* BreathPattern.swift */,
+				B17AD76D43A5EE2E91BB9BBF /* CognitiveShuffle.swift */,
+				C17B1C923DCD6E3677D2CEFE /* DemoSeed.swift */,
+				250FB9099833C7D0F6304BAE /* NidraScript.swift */,
+				B713902942C4844C31C7B66F /* Persistence.swift */,
+				92F8FAFDA1B545B2A11B90D1 /* SleepTimerController.swift */,
+				B8A9A0089CFF97B75F8C426E /* Soundscape.swift */,
+			);
+			path = Models;
+			sourceTree = "<group>";
+		};
+		8673D9EFDD2D0E778404711A /* Health */ = {
+			isa = PBXGroup;
+			children = (
+				F00EBBA3712634F0D57E8953 /* SleepHealth.swift */,
+			);
+			path = Health;
+			sourceTree = "<group>";
+		};
+		8F5C2D49FFD79A0C2D96C8DE /* Util */ = {
+			isa = PBXGroup;
+			children = (
+				4DFBFA83AD235AC77716F7EC /* Haptics.swift */,
+				A1D8BF2714DF3A22AA3E204A /* Loc.swift */,
+				753A6DE7F352B867975F5420 /* Theme.swift */,
+			);
+			path = Util;
+			sourceTree = "<group>";
+		};
+		952D6F80BAECB36F05411A60 /* iOS */ = {
+			isa = PBXGroup;
+			children = (
+				519E5B6100235E9384E3AA7E /* Info.plist */,
+				93039552F02C8E372B35C422 /* LaBerceuse.entitlements */,
+				F4AEBB6AE2310E5C4EA7B674 /* InfoPlist.strings */,
+			);
+			path = iOS;
+			sourceTree = "<group>";
+		};
+		C1005E5E68D3ABCF6095FBAF /* Audio */ = {
+			isa = PBXGroup;
+			children = (
+				94F54748520754DCCC2DDAD5 /* SoundEngine.swift */,
+			);
+			path = Audio;
+			sourceTree = "<group>";
+		};
+		C3F0AD49DD3895A623FA496C /* Views */ = {
+			isa = PBXGroup;
+			children = (
+				F0A71272D67979292A3E990C /* BreathView.swift */,
+				EC2B9245067DBAAC8797ED05 /* HomeView.swift */,
+				AB896594EB091512D1FD4439 /* NidraView.swift */,
+				0EC93162C25DDA3963080C9B /* NightSky.swift */,
+				570B63058EA711A6CFF53F42 /* RootView.swift */,
+				7CC0E799C296D36707039CED /* SettingsView.swift */,
+				3E554132910D5357EA2CAB2C /* ShuffleView.swift */,
+				D80F007243F2A22C9B74DB57 /* SoundscapeView.swift */,
+				0157D62245947E5DF9FE4054 /* TimerSheet.swift */,
+			);
+			path = Views;
+			sourceTree = "<group>";
+		};
+		E7D2F7A54C673880DB92F5DA = {
+			isa = PBXGroup;
+			children = (
+				952D6F80BAECB36F05411A60 /* iOS */,
+				2EBD18FA0AC9BEFF19ECC3CF /* Resources */,
+				5E036C6913A05A4FDC91F38B /* Sources */,
+				4E125EE6B50C84D5A897CC5B /* Tests */,
+				4F17B9206758E41447268204 /* Products */,
+			);
+			sourceTree = "<group>";
+		};
+/* End PBXGroup section */
+
+/* Begin PBXNativeTarget section */
+		90FC1FCA56D067DF334239C2 /* LaBerceuse */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = 5BFFE41E21141669F7877ECA /* Build configuration list for PBXNativeTarget "LaBerceuse" */;
+			buildPhases = (
+				96153A1CC09AF79AB67D241A /* Sources */,
+				B39EA356F5DF986CD7968453 /* Resources */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+			);
+			name = LaBerceuse;
+			packageProductDependencies = (
+			);
+			productName = LaBerceuse;
+			productReference = C558752E907389FA7FA9110E /* LaBerceuse.app */;
+			productType = "com.apple.product-type.application";
+		};
+		A6B6C3D5B8677AD63CC61166 /* LaBerceuseTests */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = 5160B909E196E76797BA2AC2 /* Build configuration list for PBXNativeTarget "LaBerceuseTests" */;
+			buildPhases = (
+				0963D8CFB04CC8CB716E7B5F /* Sources */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+				FE362C9F73036113BCF4D094 /* PBXTargetDependency */,
+			);
+			name = LaBerceuseTests;
+			packageProductDependencies = (
+			);
+			productName = LaBerceuseTests;
+			productReference = 8945681337059FDF77A05662 /* LaBerceuseTests.xctest */;
+			productType = "com.apple.product-type.bundle.unit-test";
+		};
+/* End PBXNativeTarget section */
+
+/* Begin PBXProject section */
+		6C1316CBFB23EC9A64755E53 /* Project object */ = {
+			isa = PBXProject;
+			attributes = {
+				BuildIndependentTargetsInParallel = YES;
+				LastUpgradeCheck = 1430;
+				TargetAttributes = {
+					90FC1FCA56D067DF334239C2 = {
+						DevelopmentTeam = 9WZ66DZ69J;
+						ProvisioningStyle = Automatic;
+					};
+					A6B6C3D5B8677AD63CC61166 = {
+						DevelopmentTeam = 9WZ66DZ69J;
+						ProvisioningStyle = Automatic;
+					};
+				};
+			};
+			buildConfigurationList = A9454702EBB94D62C2136AC2 /* Build configuration list for PBXProject "LaBerceuse" */;
+			developmentRegion = en;
+			hasScannedForEncodings = 0;
+			knownRegions = (
+				Base,
+				en,
+				fr,
+			);
+			mainGroup = E7D2F7A54C673880DB92F5DA;
+			minimizedProjectReferenceProxies = 1;
+			preferredProjectObjectVersion = 77;
+			productRefGroup = 4F17B9206758E41447268204 /* Products */;
+			projectDirPath = "";
+			projectRoot = "";
+			targets = (
+				90FC1FCA56D067DF334239C2 /* LaBerceuse */,
+				A6B6C3D5B8677AD63CC61166 /* LaBerceuseTests */,
+			);
+		};
+/* End PBXProject section */
+
+/* Begin PBXResourcesBuildPhase section */
+		B39EA356F5DF986CD7968453 /* Resources */ = {
+			isa = PBXResourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				869CF1917900E2BBE725B8E6 /* Assets.xcassets in Resources */,
+				ACEA0E5D957BE6796735CA53 /* InfoPlist.strings in Resources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXResourcesBuildPhase section */
+
+/* Begin PBXSourcesBuildPhase section */
+		0963D8CFB04CC8CB716E7B5F /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				A8E486DD7855226276774915 /* LaBerceuseTests.swift in Sources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		96153A1CC09AF79AB67D241A /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				C5BB2E731724474EBE2EAFF2 /* BreathPattern.swift in Sources */,
+				167F1440E66D41EE5D5576A9 /* BreathView.swift in Sources */,
+				0A4253400FB522D4173C20E6 /* CognitiveShuffle.swift in Sources */,
+				1F326AE1885C73562747C22C /* DemoSeed.swift in Sources */,
+				5CA2EC098AA072F23EE62E11 /* Haptics.swift in Sources */,
+				22BD73B56B4E8A50F13E4D11 /* HomeView.swift in Sources */,
+				52FAF1F0AD105243041B4D69 /* LaBerceuseApp.swift in Sources */,
+				69FF5D343A7F7E5FC96E2F9C /* Loc.swift in Sources */,
+				1D4B0B72BE875E91A7F6DC4E /* Narrator.swift in Sources */,
+				F693093A3F51C8EC0C4784B6 /* NidraScript.swift in Sources */,
+				5C7C1A6066051243803068EA /* NidraView.swift in Sources */,
+				28CB46BB2D3B655252F79172 /* NightSky.swift in Sources */,
+				BC3CD619984AA695AB388C28 /* Persistence.swift in Sources */,
+				66D79EF0261170024CCBD653 /* RootView.swift in Sources */,
+				2DE1E425D294D24143CCE976 /* SettingsView.swift in Sources */,
+				446010459CEBFE74497B0F51 /* ShuffleView.swift in Sources */,
+				1F02BC3C9ABC440227BAB7F2 /* SleepHealth.swift in Sources */,
+				68E4302861FB437DA5DEBDD5 /* SleepTimerController.swift in Sources */,
+				9E80DB62FFD1D670BB17741F /* SoundEngine.swift in Sources */,
+				27F15FB4BCBF0F468FDE7705 /* Soundscape.swift in Sources */,
+				61D628716CDDCFB4B51C5CB1 /* SoundscapeView.swift in Sources */,
+				40A4C0A3F67BEB086C8673B3 /* Theme.swift in Sources */,
+				AECD2236053E6A7669A70290 /* TimerSheet.swift in Sources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXSourcesBuildPhase section */
+
+/* Begin PBXTargetDependency section */
+		FE362C9F73036113BCF4D094 /* PBXTargetDependency */ = {
+			isa = PBXTargetDependency;
+			target = 90FC1FCA56D067DF334239C2 /* LaBerceuse */;
+			targetProxy = E41B0D6A0485898CFE235310 /* PBXContainerItemProxy */;
+		};
+/* End PBXTargetDependency section */
+
+/* Begin PBXVariantGroup section */
+		F4AEBB6AE2310E5C4EA7B674 /* InfoPlist.strings */ = {
+			isa = PBXVariantGroup;
+			children = (
+				CE7CD1A4DD2D8BD679EFA024 /* en */,
+				D49EAFD4B6F749C018AB6A8D /* fr */,
+			);
+			name = InfoPlist.strings;
+			sourceTree = "<group>";
+		};
+/* End PBXVariantGroup section */
+
+/* Begin XCBuildConfiguration section */
+		11858A47EFDDF9DD696C1F33 /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				BUNDLE_LOADER = "$(TEST_HOST)";
+				GENERATE_INFOPLIST_FILE = YES;
+				IPHONEOS_DEPLOYMENT_TARGET = 17.0;
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/Frameworks",
+					"@loader_path/Frameworks",
+				);
+				PRODUCT_BUNDLE_IDENTIFIER = app.atelier.laberceuse.tests;
+				SDKROOT = iphoneos;
+				TARGETED_DEVICE_FAMILY = "1,2";
+				TEST_HOST = "$(BUILT_PRODUCTS_DIR)/La Berceuse.app/La Berceuse";
+			};
+			name = Release;
+		};
+		574D837B57F73DAC860D518E /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ALWAYS_SEARCH_USER_PATHS = NO;
+				CLANG_ANALYZER_NONNULL = YES;
+				CLANG_ANALYZER_NUMBER_OBJECT_CONVERSION = YES_AGGRESSIVE;
+				CLANG_CXX_LANGUAGE_STANDARD = "gnu++14";
+				CLANG_CXX_LIBRARY = "libc++";
+				CLANG_ENABLE_MODULES = YES;
+				CLANG_ENABLE_OBJC_ARC = YES;
+				CLANG_ENABLE_OBJC_WEAK = YES;
+				CLANG_WARN_BLOCK_CAPTURE_AUTORELEASING = YES;
+				CLANG_WARN_BOOL_CONVERSION = YES;
+				CLANG_WARN_COMMA = YES;
+				CLANG_WARN_CONSTANT_CONVERSION = YES;
+				CLANG_WARN_DEPRECATED_OBJC_IMPLEMENTATIONS = YES;
+				CLANG_WARN_DIRECT_OBJC_ISA_USAGE = YES_ERROR;
+				CLANG_WARN_DOCUMENTATION_COMMENTS = YES;
+				CLANG_WARN_EMPTY_BODY = YES;
+				CLANG_WARN_ENUM_CONVERSION = YES;
+				CLANG_WARN_INFINITE_RECURSION = YES;
+				CLANG_WARN_INT_CONVERSION = YES;
+				CLANG_WARN_NON_LITERAL_NULL_CONVERSION = YES;
+				CLANG_WARN_OBJC_IMPLICIT_RETAIN_SELF = YES;
+				CLANG_WARN_OBJC_LITERAL_CONVERSION = YES;
+				CLANG_WARN_OBJC_ROOT_CLASS = YES_ERROR;
+				CLANG_WARN_QUOTED_INCLUDE_IN_FRAMEWORK_HEADER = YES;
+				CLANG_WARN_RANGE_LOOP_ANALYSIS = YES;
+				CLANG_WARN_STRICT_PROTOTYPES = YES;
+				CLANG_WARN_SUSPICIOUS_MOVE = YES;
+				CLANG_WARN_UNGUARDED_AVAILABILITY = YES_AGGRESSIVE;
+				CLANG_WARN_UNREACHABLE_CODE = YES;
+				CLANG_WARN__DUPLICATE_METHOD_MATCH = YES;
+				CODE_SIGN_STYLE = Automatic;
+				COPY_PHASE_STRIP = NO;
+				CURRENT_PROJECT_VERSION = 1;
+				DEBUG_INFORMATION_FORMAT = dwarf;
+				DEVELOPMENT_TEAM = 9WZ66DZ69J;
+				ENABLE_STRICT_OBJC_MSGSEND = YES;
+				ENABLE_TESTABILITY = YES;
+				ENABLE_USER_SCRIPT_SANDBOXING = YES;
+				GCC_C_LANGUAGE_STANDARD = gnu11;
+				GCC_DYNAMIC_NO_PIC = NO;
+				GCC_NO_COMMON_BLOCKS = YES;
+				GCC_OPTIMIZATION_LEVEL = 0;
+				GCC_PREPROCESSOR_DEFINITIONS = (
+					"$(inherited)",
+					"DEBUG=1",
+				);
+				GCC_WARN_64_TO_32_BIT_CONVERSION = YES;
+				GCC_WARN_ABOUT_RETURN_TYPE = YES_ERROR;
+				GCC_WARN_UNDECLARED_SELECTOR = YES;
+				GCC_WARN_UNINITIALIZED_AUTOS = YES_AGGRESSIVE;
+				GCC_WARN_UNUSED_FUNCTION = YES;
+				GCC_WARN_UNUSED_VARIABLE = YES;
+				GENERATE_INFOPLIST_FILE = NO;
+				IPHONEOS_DEPLOYMENT_TARGET = 17.0;
+				MARKETING_VERSION = 1.0;
+				MTL_ENABLE_DEBUG_INFO = INCLUDE_SOURCE;
+				MTL_FAST_MATH = YES;
+				ONLY_ACTIVE_ARCH = YES;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SDKROOT = iphoneos;
+				SWIFT_ACTIVE_COMPILATION_CONDITIONS = DEBUG;
+				SWIFT_EMIT_LOC_STRINGS = YES;
+				SWIFT_OPTIMIZATION_LEVEL = "-Onone";
+				SWIFT_VERSION = 5.0;
+			};
+			name = Debug;
+		};
+		7914EF79D60440586B3CE2EA /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
+				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
+				CODE_SIGN_ENTITLEMENTS = iOS/LaBerceuse.entitlements;
+				CODE_SIGN_IDENTITY = "iPhone Developer";
+				ENABLE_PREVIEWS = YES;
+				INFOPLIST_FILE = iOS/Info.plist;
+				IPHONEOS_DEPLOYMENT_TARGET = 17.0;
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/Frameworks",
+				);
+				PRODUCT_BUNDLE_IDENTIFIER = app.atelier.laberceuse;
+				PRODUCT_NAME = "La Berceuse";
+				SDKROOT = iphoneos;
+				SUPPORTS_MACCATALYST = NO;
+				TARGETED_DEVICE_FAMILY = "1,2";
+			};
+			name = Release;
+		};
+		A0ECC56F1C59FDB02BE77157 /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
+				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
+				CODE_SIGN_ENTITLEMENTS = iOS/LaBerceuse.entitlements;
+				CODE_SIGN_IDENTITY = "iPhone Developer";
+				ENABLE_PREVIEWS = YES;
+				INFOPLIST_FILE = iOS/Info.plist;
+				IPHONEOS_DEPLOYMENT_TARGET = 17.0;
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/Frameworks",
+				);
+				PRODUCT_BUNDLE_IDENTIFIER = app.atelier.laberceuse;
+				PRODUCT_NAME = "La Berceuse";
+				SDKROOT = iphoneos;
+				SUPPORTS_MACCATALYST = NO;
+				TARGETED_DEVICE_FAMILY = "1,2";
+			};
+			name = Debug;
+		};
+		EB7F9D902A5BDB8B79F25BDB /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				BUNDLE_LOADER = "$(TEST_HOST)";
+				GENERATE_INFOPLIST_FILE = YES;
+				IPHONEOS_DEPLOYMENT_TARGET = 17.0;
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/Frameworks",
+					"@loader_path/Frameworks",
+				);
+				PRODUCT_BUNDLE_IDENTIFIER = app.atelier.laberceuse.tests;
+				SDKROOT = iphoneos;
+				TARGETED_DEVICE_FAMILY = "1,2";
+				TEST_HOST = "$(BUILT_PRODUCTS_DIR)/La Berceuse.app/La Berceuse";
+			};
+			name = Debug;
+		};
+		F4F80E272DFDC46400FB17CC /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ALWAYS_SEARCH_USER_PATHS = NO;
+				CLANG_ANALYZER_NONNULL = YES;
+				CLANG_ANALYZER_NUMBER_OBJECT_CONVERSION = YES_AGGRESSIVE;
+				CLANG_CXX_LANGUAGE_STANDARD = "gnu++14";
+				CLANG_CXX_LIBRARY = "libc++";
+				CLANG_ENABLE_MODULES = YES;
+				CLANG_ENABLE_OBJC_ARC = YES;
+				CLANG_ENABLE_OBJC_WEAK = YES;
+				CLANG_WARN_BLOCK_CAPTURE_AUTORELEASING = YES;
+				CLANG_WARN_BOOL_CONVERSION = YES;
+				CLANG_WARN_COMMA = YES;
+				CLANG_WARN_CONSTANT_CONVERSION = YES;
+				CLANG_WARN_DEPRECATED_OBJC_IMPLEMENTATIONS = YES;
+				CLANG_WARN_DIRECT_OBJC_ISA_USAGE = YES_ERROR;
+				CLANG_WARN_DOCUMENTATION_COMMENTS = YES;
+				CLANG_WARN_EMPTY_BODY = YES;
+				CLANG_WARN_ENUM_CONVERSION = YES;
+				CLANG_WARN_INFINITE_RECURSION = YES;
+				CLANG_WARN_INT_CONVERSION = YES;
+				CLANG_WARN_NON_LITERAL_NULL_CONVERSION = YES;
+				CLANG_WARN_OBJC_IMPLICIT_RETAIN_SELF = YES;
+				CLANG_WARN_OBJC_LITERAL_CONVERSION = YES;
+				CLANG_WARN_OBJC_ROOT_CLASS = YES_ERROR;
+				CLANG_WARN_QUOTED_INCLUDE_IN_FRAMEWORK_HEADER = YES;
+				CLANG_WARN_RANGE_LOOP_ANALYSIS = YES;
+				CLANG_WARN_STRICT_PROTOTYPES = YES;
+				CLANG_WARN_SUSPICIOUS_MOVE = YES;
+				CLANG_WARN_UNGUARDED_AVAILABILITY = YES_AGGRESSIVE;
+				CLANG_WARN_UNREACHABLE_CODE = YES;
+				CLANG_WARN__DUPLICATE_METHOD_MATCH = YES;
+				CODE_SIGN_STYLE = Automatic;
+				COPY_PHASE_STRIP = NO;
+				CURRENT_PROJECT_VERSION = 1;
+				DEBUG_INFORMATION_FORMAT = "dwarf-with-dsym";
+				DEVELOPMENT_TEAM = 9WZ66DZ69J;
+				ENABLE_NS_ASSERTIONS = NO;
+				ENABLE_STRICT_OBJC_MSGSEND = YES;
+				ENABLE_USER_SCRIPT_SANDBOXING = YES;
+				GCC_C_LANGUAGE_STANDARD = gnu11;
+				GCC_NO_COMMON_BLOCKS = YES;
+				GCC_WARN_64_TO_32_BIT_CONVERSION = YES;
+				GCC_WARN_ABOUT_RETURN_TYPE = YES_ERROR;
+				GCC_WARN_UNDECLARED_SELECTOR = YES;
+				GCC_WARN_UNINITIALIZED_AUTOS = YES_AGGRESSIVE;
+				GCC_WARN_UNUSED_FUNCTION = YES;
+				GCC_WARN_UNUSED_VARIABLE = YES;
+				GENERATE_INFOPLIST_FILE = NO;
+				IPHONEOS_DEPLOYMENT_TARGET = 17.0;
+				MARKETING_VERSION = 1.0;
+				MTL_ENABLE_DEBUG_INFO = NO;
+				MTL_FAST_MATH = YES;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SDKROOT = iphoneos;
+				SWIFT_COMPILATION_MODE = wholemodule;
+				SWIFT_EMIT_LOC_STRINGS = YES;
+				SWIFT_OPTIMIZATION_LEVEL = "-O";
+				SWIFT_VERSION = 5.0;
+			};
+			name = Release;
+		};
+/* End XCBuildConfiguration section */
+
+/* Begin XCConfigurationList section */
+		5160B909E196E76797BA2AC2 /* Build configuration list for PBXNativeTarget "LaBerceuseTests" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				EB7F9D902A5BDB8B79F25BDB /* Debug */,
+				11858A47EFDDF9DD696C1F33 /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Debug;
+		};
+		5BFFE41E21141669F7877ECA /* Build configuration list for PBXNativeTarget "LaBerceuse" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				A0ECC56F1C59FDB02BE77157 /* Debug */,
+				7914EF79D60440586B3CE2EA /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Debug;
+		};
+		A9454702EBB94D62C2136AC2 /* Build configuration list for PBXProject "LaBerceuse" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				574D837B57F73DAC860D518E /* Debug */,
+				F4F80E272DFDC46400FB17CC /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Debug;
+		};
+/* End XCConfigurationList section */
+	};
+	rootObject = 6C1316CBFB23EC9A64755E53 /* Project object */;
+}

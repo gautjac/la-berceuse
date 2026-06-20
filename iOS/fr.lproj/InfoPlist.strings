@@ -1,0 +1,5 @@
+/* La Berceuse — chaînes système (français). Affichées par iOS dans les
+   dialogues de permission HealthKit. */
+"CFBundleDisplayName" = "La Berceuse";
+"NSHealthShareUsageDescription" = "La Berceuse lit ton sommeil de la nuit dernière pour t'offrir un mot doux au réveil.";
+"NSHealthUpdateUsageDescription" = "La Berceuse enregistre tes rituels de coucher dans Santé comme du temps de détente avant le sommeil.";
