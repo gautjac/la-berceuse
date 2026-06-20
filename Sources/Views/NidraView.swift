@@ -186,7 +186,7 @@ struct NidraPlayerView: View {
 
     private func speakCurrent() {
         guard settings.speechEnabled, lineIndex < lines.count else { return }
-        Narrator.shared.speak(lines[lineIndex], lang: loc.lang, rate: 0.40, pitch: 0.95, volume: 0.7)
+        Narrator.shared.speak(lines[lineIndex], lang: loc.lang, volume: 0.7)
     }
 
     private func finish() {

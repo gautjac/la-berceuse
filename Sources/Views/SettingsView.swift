@@ -8,6 +8,18 @@ struct SettingsView: View {
     @Query private var settingsRows: [Settings]
     @Query(sort: \RitualSession.startedAt, order: .reverse) private var history: [RitualSession]
 
+    @AppStorage("berceuse.voiceID.fr") private var voiceIDfr = ""
+    @AppStorage("berceuse.voiceID.en") private var voiceIDen = ""
+    @AppStorage(Narrator.rateKey) private var voiceRate = Narrator.defaultRate
+    @AppStorage(Narrator.pitchKey) private var voicePitch = Narrator.defaultPitch
+
+    private var activeVoiceID: Binding<String> {
+        Binding(
+            get: { loc.lang == .fr ? voiceIDfr : voiceIDen },
+            set: { if loc.lang == .fr { voiceIDfr = $0 } else { voiceIDen = $0 } }
+        )
+    }
+
     private var settings: Settings {
         if let s = settingsRows.first { return s }
         let s = Settings(); ctx.insert(s); return s
@@ -54,6 +66,59 @@ struct SettingsView: View {
                         }
                     }
 
+                    section(loc.t("Voix", "Voice")) {
+                        VStack(alignment: .leading, spacing: 16) {
+                            VStack(alignment: .leading, spacing: 6) {
+                                Text(loc.t("Voix parlée", "Spoken voice"))
+                                    .font(.quietRounded(14)).foregroundStyle(Theme.moonlight)
+                                Picker(selection: activeVoiceID) {
+                                    Text(loc.t("Automatique (meilleure voix)", "Automatic (best voice)")).tag("")
+                                    ForEach(Narrator.voiceChoices(for: loc.lang)) { c in
+                                        Text(c.label).tag(c.id)
+                                    }
+                                } label: { EmptyView() }
+                                .pickerStyle(.menu)
+                                .tint(Theme.amber)
+                            }
+
+                            VStack(alignment: .leading, spacing: 6) {
+                                Text(loc.t("Lenteur", "Slowness"))
+                                    .font(.quietRounded(14)).foregroundStyle(Theme.moonlight)
+                                // Lower rate = slower; show as "slowness" so left = calmer.
+                                Slider(value: Binding(
+                                    get: { 0.50 - voiceRate },          // 0 (fast) … 0.20 (slowest)
+                                    set: { voiceRate = 0.50 - $0 }
+                                ), in: 0.02...0.20)
+                                .tint(Theme.amberDeep)
+                            }
+
+                            VStack(alignment: .leading, spacing: 6) {
+                                Text(loc.t("Hauteur", "Pitch"))
+                                    .font(.quietRounded(14)).foregroundStyle(Theme.moonlight)
+                                Slider(value: $voicePitch, in: 0.80...1.10)
+                                    .tint(Theme.amberDeep)
+                            }
+
+                            Button {
+                                Narrator.shared.speak(
+                                    loc.t("Respire lentement… laisse la nuit venir.",
+                                          "Breathe slowly… let the night come."),
+                                    lang: loc.lang)
+                            } label: {
+                                Label(loc.t("Aperçu de la voix", "Preview voice"),
+                                      systemImage: "speaker.wave.2.fill")
+                                    .font(.quietRounded(14, .semibold))
+                                    .foregroundStyle(Theme.amber)
+                            }
+
+                            if !Narrator.hasHighQualityVoice(for: loc.lang) {
+                                Text(loc.t("Astuce : téléchargez une voix « Améliorée » ou « Premium » dans Réglages → Accessibilité → Contenu énoncé → Voix, puis choisissez-la ici.",
+                                           "Tip: download an Enhanced or Premium voice in Settings → Accessibility → Spoken Content → Voices, then pick it here."))
+                                    .font(.quietRounded(11)).foregroundStyle(Theme.mutedFar)
+                            }
+                        }
+                    }
+
                     if !history.isEmpty {
                         section(loc.t("Tes rituels", "Your rituals")) {
                             VStack(spacing: 10) {
@@ -72,6 +137,7 @@ struct SettingsView: View {
                 .padding(20)
             }
             .scrollIndicators(.hidden)
+            .onAppear { Narrator.shared.requestPersonalVoiceIfPossible() }
             .background(Theme.indigoDeep.ignoresSafeArea())
             .navigationTitle(loc.t("Réglages", "Settings"))
             .navigationBarTitleDisplayMode(.inline)
