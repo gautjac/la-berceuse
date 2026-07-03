@@ -4,6 +4,7 @@ import SwiftData
 /// Pick an NSDR / yoga-nidra script.
 struct NidraListView: View {
     @EnvironmentObject var loc: LocManager
+    @EnvironmentObject var sleepTimer: SleepTimerController
     @State private var selected: NidraScript?
 
     var body: some View {
@@ -29,7 +30,12 @@ struct NidraListView: View {
         }
         .scrollIndicators(.hidden)
         .fullScreenCover(item: $selected) { script in
+            // A cover gets a fresh environment, so re-inject the app-wide timer
+            // (loc rides the scene). This is what lets a sleep timer govern the
+            // nidra the same way it governs the soundscapes and the music.
             NidraPlayerView(script: script)
+                .environmentObject(sleepTimer)
+                .environmentObject(loc)
         }
         .onAppear {
             if ProcessInfo.processInfo.arguments.contains("-demoNidra") {
@@ -65,6 +71,7 @@ struct NidraListView: View {
 /// night sky. A subtle progress arc tracks the journey.
 struct NidraPlayerView: View {
     @EnvironmentObject var loc: LocManager
+    @EnvironmentObject var sleepTimer: SleepTimerController
     @Environment(\.dismiss) private var dismiss
     @Environment(\.modelContext) private var ctx
     @Query private var settingsRows: [Settings]
@@ -75,6 +82,7 @@ struct NidraPlayerView: View {
     @State private var ticker: Timer?
     @State private var sessionStart = Date()
     @State private var fade = false
+    @State private var showTimer = false
 
     private var settings: Settings { settingsRows.first ?? Settings() }
     private var lines: [String] { script.lines(loc.lang) }
@@ -97,6 +105,15 @@ struct NidraPlayerView: View {
         }
         .onAppear { begin() }
         .onDisappear { finish() }
+        // When the app-wide sleep timer reaches silence, the nidra winds down too.
+        .onChange(of: sleepTimer.completions) { _, _ in endByTimer() }
+        .sheet(isPresented: $showTimer) {
+            TimerSheet()
+                .presentationDetents([.medium])
+                .presentationBackground(Theme.indigoDeep)
+                .environmentObject(sleepTimer)
+                .environmentObject(loc)
+        }
     }
 
     private var topBar: some View {
@@ -109,7 +126,17 @@ struct NidraPlayerView: View {
             Text(loc.t(script.titleFR, script.titleEN))
                 .font(.quietRounded(14, .medium)).foregroundStyle(Theme.mist)
             Spacer()
-            Image(systemName: "xmark").opacity(0)   // balance
+            Button { showTimer = true } label: {
+                HStack(spacing: 5) {
+                    Image(systemName: "timer").font(.system(size: 15, weight: .medium))
+                    if sleepTimer.isActive {
+                        Text(sleepTimer.clockString).font(.quietRounded(12, .medium))
+                    }
+                }
+                .foregroundStyle(sleepTimer.isActive ? Theme.amber : Theme.mutedFar)
+            }
+            .buttonStyle(.plain)
+            .accessibilityLabel(loc.t("Minuterie de sommeil", "Sleep timer"))
         }
         .padding(.top, 18)
     }
@@ -186,7 +213,19 @@ struct NidraPlayerView: View {
 
     private func speakCurrent() {
         guard settings.speechEnabled, lineIndex < lines.count else { return }
-        Narrator.shared.speak(lines[lineIndex], lang: loc.lang, volume: 0.7)
+        // Ride the sleep-timer fade: each spoken line gets quieter as the timer
+        // eases toward silence (multiplier is 1 when no timer is armed).
+        let m = sleepTimer.timer.volumeMultiplier
+        Narrator.shared.speak(lines[lineIndex], lang: loc.lang, volume: Float(0.7 * m))
+    }
+
+    /// Called when the sleep timer reaches silence — stop narrating and close,
+    /// so the nidra ends together with the music and soundscapes.
+    private func endByTimer() {
+        running = false
+        ticker?.invalidate(); ticker = nil
+        Narrator.shared.stop()
+        dismiss()
     }
 
     private func finish() {

@@ -16,7 +16,9 @@ settings:
   base:
     SWIFT_VERSION: "5.0"
     MARKETING_VERSION: "1.0"
-    CURRENT_PROJECT_VERSION: "1"
+    # Bump on each device reinstall so iPadOS/iOS refreshes the cached home-screen
+    # icon instead of keeping a stale (blank) slot from an earlier install.
+    CURRENT_PROJECT_VERSION: "4"
     # Jac's paid Apple Developer team — must live in the BASE settings so it
     # propagates to every target and ./gen.sh keeps it.
     DEVELOPMENT_TEAM: "9WZ66DZ69J"

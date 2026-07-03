@@ -16,6 +16,7 @@ struct LaBerceuseApp: App {
         }
         DemoSeed.seedIfNeeded(container.mainContext)
         SoundEngine.shared.prepare()
+        MusicEngine.shared.prepare()
     }
 
     var body: some Scene {

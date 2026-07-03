@@ -199,4 +199,394 @@ final class LaBerceuseTests: XCTestCase {
             XCTAssertFalse(s.linesFR.isEmpty)
         }
     }
+
+    // MARK: - Generative music: scales & pitch
+
+    func testScaleWrapsAcrossOctaves() {
+        let s = MusicScale.pentatonicMajor   // [0,2,4,7,9]
+        XCTAssertEqual(s.midi(rootMidi: 60, index: 0), 60)
+        XCTAssertEqual(s.midi(rootMidi: 60, index: 4), 69)         // top of octave
+        XCTAssertEqual(s.midi(rootMidi: 60, index: 5), 72)         // tonic, one octave up
+        XCTAssertEqual(s.midi(rootMidi: 60, index: -1), 60 + 9 - 12) // degree 4 one octave down
+    }
+
+    func testPentatonicHasNoSemitoneClashes() {
+        // Adjacent scale degrees in a pentatonic are always ≥ 2 semitones apart,
+        // which is what keeps simultaneous notes consonant.
+        for scale in [MusicScale.pentatonicMajor, .pentatonicMinor] {
+            let d = scale.degrees
+            for i in 1..<d.count { XCTAssertGreaterThanOrEqual(d[i] - d[i - 1], 2) }
+        }
+    }
+
+    func testPitchFrequencyReference() {
+        XCTAssertEqual(Pitch.frequency(midi: 69), 440, accuracy: 0.0001)   // A4
+        XCTAssertEqual(Pitch.frequency(midi: 57), 220, accuracy: 0.0001)   // A3
+    }
+
+    // MARK: - Amplitude-modulation math (the brain.fm layer)
+
+    func testAModStaysWithinBounds() {
+        for depthTimes100 in stride(from: 0, through: 60, by: 5) {
+            let depth = Double(depthTimes100) / 100.0
+            let clamped = min(0.35, depth)
+            for p in stride(from: 0.0, through: 1.0, by: 0.05) {
+                let g = AModMath.gain(phase: p, depth: depth)
+                XCTAssertLessThanOrEqual(g, 1.0 + 1e-9, "never boosts past unity")
+                XCTAssertGreaterThanOrEqual(g, 1 - clamped - 1e-9, "never ducks below 1−depth")
+            }
+        }
+    }
+
+    func testAModPhaseExtremes() {
+        XCTAssertEqual(AModMath.gain(phase: 0, depth: 0.3), 1.0, accuracy: 1e-9)       // peak
+        XCTAssertEqual(AModMath.gain(phase: 0.5, depth: 0.3), 0.7, accuracy: 1e-9)     // trough = 1−depth
+        XCTAssertEqual(AModMath.gain(phase: 0.37, depth: 0.0), 1.0, accuracy: 1e-9)    // no effect at 0
+    }
+
+    // MARK: - Chord progression voice-leading
+
+    func testProgressionStaysConsonantAndNear() {
+        let prog = ChordProgression()            // roots [0,3,4,1,5], maxStep 2
+        var rng = SeededRNG(seed: 0xC0FFEE)
+        var current = 0
+        for _ in 0..<2000 {
+            let next = prog.nextRoot(current: current, using: &rng)
+            XCTAssertTrue(prog.allowedRoots.contains(next), "stays in the chord pool")
+            XCTAssertLessThanOrEqual(abs(next - current), prog.maxStep, "no jarring leap")
+            current = next
+        }
+    }
+
+    func testProgressionIsDeterministicForASeed() {
+        func run() -> [Int] {
+            let prog = ChordProgression()
+            var rng = SeededRNG(seed: 42)
+            var cur = 0
+            return (0..<20).map { _ in cur = prog.nextRoot(current: cur, using: &rng); return cur }
+        }
+        XCTAssertEqual(run(), run())
+    }
+
+    // MARK: - The adaptive director (Endel layer)
+
+    private func baseContext(progress: Double, hr: Double? = nil,
+                             complexity: Double = 1) -> MusicContext {
+        MusicContext(program: .detente, userIntensity: 1, userPulse: 1,
+                     userComplexity: complexity, sessionProgress: progress,
+                     hourOfDay: 22, breathCyclePeriod: 11, heartRate: hr)
+    }
+
+    func testSessionDeEnergizesMonotonically() {
+        var lastDensity = Double.infinity
+        var lastMelody = Double.infinity
+        var lastChordSeconds = -Double.infinity
+        for step in stride(from: 0.0, through: 1.0, by: 0.05) {
+            let p = MusicDirector.params(for: baseContext(progress: step))
+            XCTAssertLessThanOrEqual(p.noteDensity, lastDensity + 1e-9, "density only falls")
+            XCTAssertLessThanOrEqual(p.melodyGain, lastMelody + 1e-9, "melody only recedes")
+            XCTAssertGreaterThanOrEqual(p.chordSeconds, lastChordSeconds - 1e-9, "chords only lengthen")
+            lastDensity = p.noteDensity
+            lastMelody = p.melodyGain
+            lastChordSeconds = p.chordSeconds
+        }
+    }
+
+    func testRegisterDropsLateInTheSession() {
+        let early = MusicDirector.params(for: baseContext(progress: 0))
+        let late = MusicDirector.params(for: baseContext(progress: 1))
+        XCTAssertLessThanOrEqual(late.rootMidi, early.rootMidi, "drops an octave near sleep")
+    }
+
+    func testModulationStaysSubtle() {
+        for step in stride(from: 0.0, through: 1.0, by: 0.1) {
+            let p = MusicDirector.params(for: baseContext(progress: step))
+            XCTAssertLessThanOrEqual(p.modDepth, 0.35, "pulse never becomes a throb")
+            XCTAssertGreaterThan(p.modDepth, 0, "pulse present when the user asks for it")
+        }
+    }
+
+    func testNoPulseWhenUserPulseZero() {
+        let ctx = MusicContext(program: .souffle, userIntensity: 0.7, userPulse: 0,
+                               sessionProgress: 0, hourOfDay: 23, breathCyclePeriod: 8)
+        XCTAssertEqual(MusicDirector.params(for: ctx).modDepth, 0, accuracy: 1e-9)
+    }
+
+    func testSouffleLocksPulseToBreathPeriod() {
+        let ctx = MusicContext(program: .souffle, userIntensity: 0.6, userPulse: 0.5,
+                               sessionProgress: 0, hourOfDay: 23,
+                               breathCyclePeriod: 11, heartRate: nil)   // coherent 5.5
+        // One modulation cycle per breath → ~0.0909 Hz.
+        XCTAssertEqual(MusicDirector.params(for: ctx).modRateHz, 1.0 / 11.0, accuracy: 1e-6)
+    }
+
+    func testCircadianIsCalmerOvernight() {
+        XCTAssertGreaterThan(MusicDirector.circadianCalm(hourOfDay: 2),
+                             MusicDirector.circadianCalm(hourOfDay: 22))
+        XCTAssertEqual(MusicDirector.circadianCalm(hourOfDay: 14), 0, accuracy: 1e-9) // daytime neutral
+    }
+
+    func testHeartRateNudgeIsBoundedAndGraceful() {
+        let none = MusicDirector.params(for: baseContext(progress: 0, hr: nil))
+        let low = MusicDirector.params(for: baseContext(progress: 0, hr: 50))
+        let high = MusicDirector.params(for: baseContext(progress: 0, hr: 95))
+        // A higher HR yields a slightly quicker pulse, a lower one slower — but
+        // always within a gentle band around the no-HR baseline.
+        XCTAssertGreaterThan(high.modRateHz, low.modRateHz)
+        XCTAssertEqual(low.modRateHz, none.modRateHz * 0.92, accuracy: 1e-6)
+    }
+
+    func testDirectorOutputsAreFiniteAndInRange() {
+        for prog in MusicProgram.allCases {
+            for step in stride(from: 0.0, through: 1.0, by: 0.25) {
+                let ctx = MusicContext(program: prog, userIntensity: 0.8, userPulse: 0.7,
+                                       sessionProgress: step, hourOfDay: 1, breathCyclePeriod: 16, heartRate: 64)
+                let p = MusicDirector.params(for: ctx)
+                for g in [p.padGain, p.bassGain, p.melodyGain, p.brightness] {
+                    XCTAssertTrue(g.isFinite && g >= 0 && g <= 1)
+                }
+                XCTAssertGreaterThan(p.noteDensity, 0)
+                XCTAssertGreaterThan(p.chordSeconds, 0)
+                XCTAssertGreaterThan(p.modRateHz, 0)
+            }
+        }
+    }
+
+    // MARK: - Complexity (the new axis)
+
+    private func cxContext(_ complexity: Double, intensity: Double = 0.8,
+                           progress: Double = 0) -> MusicContext {
+        // Daytime hour keeps circadian neutral so the test isolates `complexity`.
+        MusicContext(program: .detente, userIntensity: intensity, userPulse: 0.5,
+                     userComplexity: complexity, sessionProgress: progress,
+                     hourOfDay: 14, breathCyclePeriod: 11)
+    }
+
+    func testComplexityRaisesMusicalActivity() {
+        let low = MusicDirector.params(for: cxContext(0.15))
+        let high = MusicDirector.params(for: cxContext(0.9))
+        XCTAssertGreaterThan(high.noteDensity, low.noteDensity, "busier")
+        XCTAssertLessThan(high.chordSeconds, low.chordSeconds, "harmony moves more often")
+        XCTAssertGreaterThan(high.melodyGain, low.melodyGain, "melody is more present")
+        XCTAssertGreaterThan(high.melodyRange, low.melodyRange, "melody roams wider")
+        XCTAssertGreaterThanOrEqual(high.progressionRoots.count, low.progressionRoots.count, "richer harmony")
+        XCTAssertGreaterThanOrEqual(high.chordStack.count, low.chordStack.count, "richer voicings")
+    }
+
+    func testFullComplexityFlowsDensely() {
+        // At full complexity the melody should be close to continuous — a note
+        // roughly every ~1.3 s or faster (≥ 45 notes/min), not sparse plinks.
+        let p = MusicDirector.params(for: cxContext(1.0))
+        XCTAssertGreaterThan(p.noteDensity, 45, "full complexity = a flowing melody")
+    }
+
+    func testComplexityGapIsWide() {
+        // The whole point of this pass: a big spread between low and high. Full
+        // complexity is many times busier than a low setting.
+        let lowMid = MusicDirector.params(for: cxContext(0.2))
+        let full = MusicDirector.params(for: cxContext(1.0))
+        XCTAssertGreaterThan(full.noteDensity, lowMid.noteDensity * 5,
+                             "the gap between low and high complexity is wide")
+    }
+
+    func testLowestComplexityIsAStaticDrone() {
+        let p = MusicDirector.params(for: cxContext(0.0))
+        XCTAssertEqual(p.progressionRoots, [0], "stays on the tonic — no chord changes")
+        XCTAssertEqual(p.progressionMaxStep, 1)
+        XCTAssertLessThan(p.melodyGain, 0.02, "no melodic activity — felt, not heard")
+        XCTAssertEqual(p.chordStack, [0, 2], "the simplest voicing")
+    }
+
+    func testComplexityIsDecoupledFromIntensity() {
+        // The decisive proof of the split: a QUIET-but-RICH setting must be
+        // busier than a LOUD-but-SPARSE one. Activity follows complexity, not
+        // intensity.
+        let quietRich = MusicDirector.params(for: cxContext(0.9, intensity: 0.2))
+        let loudSparse = MusicDirector.params(for: cxContext(0.15, intensity: 0.95))
+        XCTAssertGreaterThan(quietRich.noteDensity, loudSparse.noteDensity)
+        XCTAssertGreaterThan(quietRich.melodyGain, loudSparse.melodyGain)
+        // …while presence (pad/brightness) still follows intensity.
+        XCTAssertGreaterThan(loudSparse.brightness, quietRich.brightness)
+        XCTAssertGreaterThan(loudSparse.padGain, quietRich.padGain)
+    }
+
+    func testComplexitySimplifiesOverTheSession() {
+        var lastRoots = Int.max
+        var lastMelody = Double.infinity
+        for step in stride(from: 0.0, through: 1.0, by: 0.1) {
+            let p = MusicDirector.params(for: baseContext(progress: step, complexity: 1))
+            XCTAssertLessThanOrEqual(p.progressionRoots.count, lastRoots, "harmony only simplifies")
+            XCTAssertLessThanOrEqual(p.melodyGain, lastMelody + 1e-9, "melody only recedes")
+            lastRoots = p.progressionRoots.count
+            lastMelody = p.melodyGain
+        }
+    }
+
+    func testComplexityMappingIsMonotone() {
+        var lastStack = 0, lastRoots = 0
+        for step in stride(from: 0.0, through: 1.0, by: 0.05) {
+            XCTAssertGreaterThanOrEqual(MusicComplexity.chordStack(step).count, lastStack)
+            XCTAssertGreaterThanOrEqual(MusicComplexity.progressionRoots(step).count, lastRoots)
+            lastStack = MusicComplexity.chordStack(step).count
+            lastRoots = MusicComplexity.progressionRoots(step).count
+        }
+    }
+
+    // MARK: - Melody reverb + delay (the "back it into the mix" DSP)
+
+    func testDelayLineReadsBackEarlierSample() {
+        let line = DelayLine(maxSamples: 16)
+        for i in 0..<10 { line.push(Double(i)) }     // last pushed = 9
+        // tap(d) = the sample written d pushes ago (1 = most recent); tap(0) is
+        // the write head, not yet written.
+        XCTAssertEqual(line.tap(1), 9, accuracy: 1e-9)
+        XCTAssertEqual(line.tap(2), 8, accuracy: 1e-9)
+        XCTAssertEqual(line.tap(3), 7, accuracy: 1e-9)
+        XCTAssertEqual(line.tap(0), 0, accuracy: 1e-9)
+    }
+
+    func testStereoReverbIsStableAndDecays() {
+        let rev = StereoReverb(sampleRate: 44_100)
+        var early = 0.0, late = 0.0
+        for i in 0..<88_200 {                          // 2 seconds
+            let x = i == 0 ? 1.0 : 0.0                  // a single impulse
+            let (l, r) = rev.process(x, x, mod: 0)
+            XCTAssertTrue(l.isFinite && r.isFinite, "reverb never blows up")
+            XCTAssertLessThan(abs(l) + abs(r), 8, "stays bounded")
+            if i < 4_410 { early += abs(l) + abs(r) }   // first 0.1 s
+            if i >= 83_790 { late += abs(l) + abs(r) }  // last 0.1 s
+        }
+        XCTAssertLessThan(late, early * 0.2, "the tail decays toward silence")
+    }
+
+    func testStereoSpaceLeavesATailThenSettles() {
+        let space = StereoSpace(sampleRate: 44_100)
+        space.apply(echoWet: 0.4, echoFeedback: 0.45, reverbWet: 0.6, reverbFeedback: 0.82)
+        var tailEnergy = 0.0, settled = 0.0
+        for i in 0..<176_400 {                          // 4 seconds (shimmer rings longer)
+            let dry = i == 0 ? 1.0 : 0.0
+            let (l, r) = space.process(dry)
+            XCTAssertTrue(l.isFinite && r.isFinite)
+            XCTAssertLessThan(abs(l) + abs(r), 12, "shimmer feedback stays bounded")
+            if i > 100, i < 22_050 { tailEnergy += abs(l) + abs(r) }
+            if i >= 171_990 { settled += abs(l) + abs(r) }
+        }
+        XCTAssertGreaterThan(tailEnergy, 0.01, "echo + reverb + shimmer leave an audible tail")
+        XCTAssertLessThan(settled, 0.05, "and it eventually settles toward silence")
+    }
+
+    func testStereoSpaceIsActuallyStereo() {
+        let space = StereoSpace(sampleRate: 44_100)
+        space.apply(echoWet: 0.5, echoFeedback: 0.5, reverbWet: 0.6, reverbFeedback: 0.82)
+        var diff = 0.0
+        for i in 0..<44_100 {                           // 1 second
+            let (l, r) = space.process(i == 0 ? 1.0 : 0.0)
+            diff += abs(l - r)                          // ping-pong + decorrelated reverb ⇒ L ≠ R
+        }
+        XCTAssertGreaterThan(diff, 0.1, "the space produces a genuinely stereo image")
+    }
+
+    func testStereoSpaceSilenceInSilenceOut() {
+        let space = StereoSpace(sampleRate: 44_100)
+        space.apply(echoWet: 0.4, echoFeedback: 0.45, reverbWet: 0.6, reverbFeedback: 0.82)
+        for _ in 0..<2_000 {
+            let (l, r) = space.process(0)
+            XCTAssertEqual(l, 0, accuracy: 1e-12)
+            XCTAssertEqual(r, 0, accuracy: 1e-12)
+        }
+    }
+
+    func testOctaveUpShimmerIsBounded() {
+        let shifter = OctaveUp(sampleRate: 44_100)
+        for i in 0..<44_100 {
+            // Feed a 220 Hz tone; the shifter should stay finite and bounded.
+            let x = sin(2 * .pi * 220 * Double(i) / 44_100)
+            let y = shifter.process(x)
+            XCTAssertTrue(y.isFinite)
+            XCTAssertLessThan(abs(y), 2.5)
+        }
+    }
+
+    func testDelayLineInterpolatesFractionalTaps() {
+        let line = DelayLine(maxSamples: 16)
+        for i in 0..<10 { line.push(Double(i)) }        // last pushed = 9 at tap(1)
+        // Halfway between tap(1)=9 and tap(2)=8 → 8.5.
+        XCTAssertEqual(line.tapInterpolated(1.5), 8.5, accuracy: 1e-9)
+    }
+
+    // MARK: - Stereo & tone shaping (the richness pass)
+
+    func testPanIsEqualPower() {
+        for p in stride(from: -1.0, through: 1.0, by: 0.1) {
+            let (l, r) = Pan.gains(p)
+            XCTAssertEqual(l * l + r * r, 1, accuracy: 1e-9, "constant perceived loudness")
+        }
+        XCTAssertEqual(Pan.gains(-1).l, 1, accuracy: 1e-9)   // hard left
+        XCTAssertEqual(Pan.gains(1).r, 1, accuracy: 1e-9)    // hard right
+        XCTAssertEqual(Pan.gains(0).l, Pan.gains(0).r, accuracy: 1e-9)   // centre balanced
+    }
+
+    func testSaturateIsSoftMonotonicAndOdd() {
+        XCTAssertEqual(AudioShaping.saturate(0, drive: 1.5), 0, accuracy: 1e-12)
+        // Odd symmetry.
+        XCTAssertEqual(AudioShaping.saturate(0.6, drive: 1.5),
+                       -AudioShaping.saturate(-0.6, drive: 1.5), accuracy: 1e-9)
+        // Monotonic increasing and bounded.
+        var last = -Double.infinity
+        for x in stride(from: -3.0, through: 3.0, by: 0.1) {
+            let y = AudioShaping.saturate(x, drive: 1.5)
+            XCTAssertGreaterThan(y, last - 1e-9, "monotonic")
+            XCTAssertLessThan(abs(y), 1.2, "soft-clips")
+            last = y
+        }
+    }
+
+    func testEchoAndReverbControlsMapMonotonically() {
+        func params(echo: Double, reverb: Double) -> MusicParams {
+            MusicDirector.params(for: MusicContext(
+                program: .detente, userIntensity: 0.7, userPulse: 0.5, userComplexity: 0.7,
+                sessionProgress: 0, hourOfDay: 14, breathCyclePeriod: 11,
+                heartRate: nil, userEcho: echo, userReverb: reverb))
+        }
+        let dry = params(echo: 0, reverb: 0)
+        let wet = params(echo: 1, reverb: 1)
+        XCTAssertEqual(dry.echoWet, 0, accuracy: 1e-9, "echo off = no echo")
+        XCTAssertEqual(dry.reverbWet, 0, accuracy: 1e-9, "reverb off = no tail")
+        XCTAssertGreaterThan(wet.echoWet, dry.echoWet)
+        XCTAssertGreaterThan(wet.echoFeedback, dry.echoFeedback, "more repeats")
+        XCTAssertGreaterThan(wet.reverbWet, dry.reverbWet)
+        XCTAssertGreaterThan(wet.reverbFeedback, dry.reverbFeedback, "longer tail")
+        XCTAssertLessThanOrEqual(wet.reverbFeedback, 0.92, "but never runs away")
+    }
+
+    func testStereoSpaceControlsChangeTheTail() {
+        func tailEnergy(echoWet: Double, reverbWet: Double) -> Double {
+            let space = StereoSpace(sampleRate: 44_100)
+            space.apply(echoWet: echoWet, echoFeedback: 0.45,
+                        reverbWet: reverbWet, reverbFeedback: 0.82)
+            var energy = 0.0
+            for i in 0..<88_200 {                       // 2 seconds
+                let (l, r) = space.process(i == 0 ? 1.0 : 0.0)
+                if i > 50 { energy += abs(l) + abs(r) }  // everything after the dry hit
+            }
+            return energy
+        }
+        let dry = tailEnergy(echoWet: 0, reverbWet: 0)
+        let wet = tailEnergy(echoWet: 0.5, reverbWet: 0.7)
+        XCTAssertLessThan(dry, 0.02, "no wet mix → essentially no tail")
+        XCTAssertGreaterThan(wet, dry + 0.5, "turning up echo + reverb adds an audible tail")
+    }
+}
+
+/// A seedable RNG so the generative-music tests are deterministic (the synth
+/// uses the same xorshift on the audio thread).
+struct SeededRNG: RandomNumberGenerator {
+    private var state: UInt64
+    init(seed: UInt64) { state = seed != 0 ? seed : 0x9E3779B97F4A7C15 }
+    mutating func next() -> UInt64 {
+        state ^= state >> 12
+        state ^= state << 25
+        state ^= state >> 27
+        return state &* 0x2545F4914F6CDD1D
+    }
 }

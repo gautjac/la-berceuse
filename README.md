@@ -33,13 +33,49 @@ SwiftData, AVAudioEngine, HealthKit.
   banks with a deterministic-but-varied shuffle (no repeats within a pass).
 - **Les sons — generative soundscape mixer.** Procedural `AVAudioEngine` layers,
   **no audio files**: rain, wind, brown noise, pink noise, a warm drone, distant
-  waves, and a music-box lullaby motif — each with its own volume. Save favourite
-  mixes. A **sleep timer** (15/30/45/60/90 min or custom) **fades the audio to
-  silence** on an equal-power curve, then stops the engine. Keeps playing under
-  lock (background audio).
+  waves, and a music-box lullaby motif — each with its own volume. The weather
+  layers are **alive, not static loops**: the rain ebbs between a gentle patter
+  and a heavier shower behind a drifting filter, the wind gusts vary in force and
+  spacing (two LFOs + a slow random-walk), and the surf draws a fresh period and
+  height every swell over a slow tide drift — so there's sweep and motion the
+  moment you turn one on. Save favourite mixes. A **sleep timer** (15/30/45/60/90
+  min or custom) **fades the audio to silence** on an equal-power curve, then
+  stops the engine. Keeps playing under lock (background audio).
+- **La musique générative — an endless, adaptive composer** in the spirit of
+  brain.fm and Endel, built entirely in DSP (**still no files, no network, no AI
+  calls**). A single `GenerativeMusicNode` synthesizes evolving harmonic pads (a
+  slow, voice-led walk over a consonant scale), a low gliding root, and a phrased
+  **harp-like** pentatonic melody — each pluck is a stack of harmonics whose upper
+  partials decay faster than the fundamental (so it's bright at the attack and
+  darkens as it rings), with a soft 4 ms onset. The melody is **backed off into
+  the mix through a procedural echo + reverb** (a feedback delay into a Freeverb-
+  style 4-comb / 2-all-pass tail, `MelodySpace`), then a gentle **breath-synced
+  amplitude modulation** is applied to the music bus — the brain.fm "neural
+  phase-locking" idea, dialled down to a swell rather than a throb. Three programs
+  — **Sommeil / Détente / Souffle** — plus five controls: **Intensité** (presence
+  / loudness), **Complexité** (how much is going on — note density, how often the
+  harmony moves, voicing richness, melodic range), **Pulsation** (the modulation
+  depth), and **Écho** + **Réverbération** for the melody's space (wet level,
+  repeats, and tail length, applied lock-free per audio block). Splitting
+  complexity out from intensity means you can ask for "quiet but rich" or
+  "present but sparse". The Complexité range is wide: at the low end it's an
+  almost static tonic drone, and at the top the melody flows nearly continuously
+  (≥ 45 notes/min, with tighter phrasing and fewer rests). Like Endel, it
+  **adapts offline**:
+  a `MusicDirector` reshapes the music from the hour of night (circadian), the
+  active breath pattern (the Souffle pulse locks to your pacer), the **sleep-timer
+  arc** (the music *de-energizes* — fewer notes, lower register, darker, slower —
+  and ebbs to silence with the same fade), and **live heart rate via HealthKit**
+  (optional, device-only, graceful when denied). Saved mixes recall the program.
+  All the musical and signal math lives in pure, unit-tested value types
+  (`GenerativeMusic.swift`).
 - **Le repos profond — NSDR / yoga-nidra.** Guided body-scan and progressive-
   relaxation scripts, revealed line-by-line at a calm pace with optional soft TTS,
-  timed (10 / 20 min).
+  timed (10 / 20 min). The **generative music keeps playing underneath** a session
+  (the engine is app-wide; the voice mixes over it), and the **sleep timer governs
+  everything together** — the spoken voice rides the same fade and the nidra winds
+  down with the music and soundscapes when the timer reaches silence. A timer chip
+  in the player arms it without leaving the session.
 - **HealthKit.** Asks permission, shows last night's sleep as a gentle stat, and
   logs each wind-down ritual to Health as in-bed / mindful time. Fails gracefully
   when denied or unavailable.
@@ -68,7 +104,13 @@ xcodebuild -project LaBerceuse.xcodeproj -scheme LaBerceuse \
 ```
 
 **Tests** (breath-pacing math, cognitive-shuffle generator, fade-curve, sleep-timer,
-nidra pacing — 25 tests):
+nidra pacing, and the generative-music model — scale wrapping, amplitude-modulation
+bounds, chord voice-leading determinism, the de-energizing session arc, breath-sync,
+circadian curve, the heart-rate nudge, and the complexity axis (richer harmony /
+voicing / activity, decoupled from intensity), and the melody's reverb/delay DSP
+(delay-line indexing, reverb stability + decay, echo tail), and the Écho /
+Réverbération controls (wet-level + feedback mapping, audible-tail response), and
+the widened complexity gap (full complexity flows densely; low→high spread) — 53 tests):
 
 ```bash
 xcodebuild -project LaBerceuse.xcodeproj -scheme LaBerceuse \
@@ -81,7 +123,7 @@ xcodebuild -project LaBerceuse.xcodeproj -scheme LaBerceuse \
 The app honours launch arguments so screens can be captured without taps:
 `-demoLang fr|en`, `-demoTab home|breath|sound|shuffle|nidra`, `-demoRun`
 (auto-start breath/shuffle), `-demoNidra` (open a player), `-demoTimer`,
-`-demoSleep`, `-demoNoHealth`.
+`-demoSleep`, `-demoMusic` (auto-start the generative composer), `-demoNoHealth`.
 
 ## Device
 
@@ -117,8 +159,11 @@ in the simulator.
 Sources/
   Util/      Loc.swift (FR/EN), Theme.swift, Haptics.swift
   Models/    BreathPattern, CognitiveShuffle, Soundscape (+ FadeMath/SleepTimer),
+             GenerativeMusic (scales, chords, MusicDirector, AModMath — pure),
              NidraScript, Persistence (SwiftData), SleepTimerController, DemoSeed
   Audio/     SoundEngine.swift  (procedural AVAudioEngine mixer)
+             MusicEngine.swift  (generative composer + breath-synced AM)
+             MelodySpace.swift  (procedural echo + Freeverb-style reverb)
   Speech/    Narrator.swift     (AVSpeechSynthesizer)
   Health/    SleepHealth.swift  (HealthKit)
   Views/     NightSky, RootView, HomeView, BreathView, SoundscapeView,

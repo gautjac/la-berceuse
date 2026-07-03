@@ -19,8 +19,8 @@ struct TimerSheet: View {
             Text(loc.t("Minuterie de sommeil", "Sleep timer"))
                 .font(.quietSerif(24))
                 .foregroundStyle(Theme.moonlight)
-            Text(loc.t("Le son s'efface en douceur, puis le silence.",
-                       "The sound fades gently, then silence."))
+            Text(loc.t("Le son, la musique et la voix s'effacent en douceur, puis le silence.",
+                       "Sound, music, and voice fade gently, then silence."))
                 .font(.quietRounded(13))
                 .foregroundStyle(Theme.mist)
                 .multilineTextAlignment(.center)

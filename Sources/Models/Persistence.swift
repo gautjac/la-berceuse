@@ -11,10 +11,32 @@ public final class SavedMix {
     /// JSON-encoded `[String: Double]` of layer → volume (0…1).
     public var volumesData: Data
 
-    public init(name: String, volumes: [String: Double]) {
+    // Generative-music recall. These are optional / defaulted so adding them is a
+    // safe SwiftData lightweight migration for stores created before the engine
+    // existed. `musicProgram == nil` means "no generative music in this mix".
+    public var musicProgram: String?
+    public var musicIntensity: Double = 0.55
+    public var musicPulse: Double = 0.5
+    public var musicComplexity: Double = 0.5
+    public var musicEcho: Double = 0.5
+    public var musicReverb: Double = 0.6
+
+    public init(name: String, volumes: [String: Double],
+                musicProgram: String? = nil,
+                musicIntensity: Double = 0.55,
+                musicPulse: Double = 0.5,
+                musicComplexity: Double = 0.5,
+                musicEcho: Double = 0.5,
+                musicReverb: Double = 0.6) {
         self.name = name
         self.createdAt = Date()
         self.volumesData = (try? JSONEncoder().encode(volumes)) ?? Data()
+        self.musicProgram = musicProgram
+        self.musicIntensity = musicIntensity
+        self.musicPulse = musicPulse
+        self.musicComplexity = musicComplexity
+        self.musicEcho = musicEcho
+        self.musicReverb = musicReverb
     }
 
     public var volumes: [String: Double] {

@@ -29,6 +29,9 @@ public final class SleepHealth: @unchecked Sendable {
     private var sleepType: HKCategoryType? {
         HKObjectType.categoryType(forIdentifier: .sleepAnalysis)
     }
+    private var heartRateType: HKQuantityType? {
+        HKObjectType.quantityType(forIdentifier: .heartRate)
+    }
 
     public var isAvailable: Bool { HKHealthStore.isHealthDataAvailable() }
 
@@ -41,6 +44,39 @@ public final class SleepHealth: @unchecked Sendable {
             return true
         } catch {
             return false
+        }
+    }
+
+    /// Ask only for heart-rate *read* access — used by the generative-music
+    /// engine to gently entrain tempo. Independent of the sleep authorization so
+    /// a listener can grant one without the other. No-ops gracefully when denied.
+    public func requestHeartRateAuthorization() async -> Bool {
+        guard isAvailable, let heartRateType else { return false }
+        do {
+            try await store.requestAuthorization(toShare: [], read: [heartRateType])
+            return true
+        } catch {
+            return false
+        }
+    }
+
+    /// The most recent heart-rate sample (bpm) within the last 15 minutes, or
+    /// nil if unavailable / not authorized / stale. Device-only in practice.
+    public func latestHeartRate() async -> Double? {
+        guard isAvailable, let heartRateType else { return nil }
+        let since = Date().addingTimeInterval(-15 * 60)
+        let predicate = HKQuery.predicateForSamples(withStart: since, end: Date(), options: [])
+        let sort = [NSSortDescriptor(key: HKSampleSortIdentifierEndDate, ascending: false)]
+        return await withCheckedContinuation { (cont: CheckedContinuation<Double?, Never>) in
+            let q = HKSampleQuery(sampleType: heartRateType, predicate: predicate,
+                                  limit: 1, sortDescriptors: sort) { _, samples, _ in
+                guard let s = (samples as? [HKQuantitySample])?.first else {
+                    cont.resume(returning: nil); return
+                }
+                let bpm = s.quantity.doubleValue(for: HKUnit.count().unitDivided(by: .minute()))
+                cont.resume(returning: bpm)
+            }
+            store.execute(q)
         }
     }
 
@@ -110,6 +146,8 @@ public final class SleepHealth: @unchecked Sendable {
     #else
     public var isAvailable: Bool { false }
     public func requestAuthorization() async -> Bool { false }
+    public func requestHeartRateAuthorization() async -> Bool { false }
+    public func latestHeartRate() async -> Double? { nil }
     public func lastNight() async -> SleepSummary? { nil }
     public func logWindDown(start: Date, end: Date) async {}
     #endif

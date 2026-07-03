@@ -32,6 +32,9 @@
 		AECD2236053E6A7669A70290 /* TimerSheet.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0157D62245947E5DF9FE4054 /* TimerSheet.swift */; };
 		BC3CD619984AA695AB388C28 /* Persistence.swift in Sources */ = {isa = PBXBuildFile; fileRef = B713902942C4844C31C7B66F /* Persistence.swift */; };
 		C5BB2E731724474EBE2EAFF2 /* BreathPattern.swift in Sources */ = {isa = PBXBuildFile; fileRef = ABD2FF4CDE00FA4D50787130 /* BreathPattern.swift */; };
+		C7DDD8AF514DFA04E5D52FBC /* MusicEngine.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2D8EBACA815BD3F371E248AE /* MusicEngine.swift */; };
+		E119713E374E8490E6D9F2EF /* GenerativeMusic.swift in Sources */ = {isa = PBXBuildFile; fileRef = CEA472FF5B26AAFB3810E138 /* GenerativeMusic.swift */; };
+		E5FAA0119D3A6EBD8B3C1F11 /* MelodySpace.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4EB6F9D9AD3ECAAAC1D13770 /* MelodySpace.swift */; };
 		F693093A3F51C8EC0C4784B6 /* NidraScript.swift in Sources */ = {isa = PBXBuildFile; fileRef = 250FB9099833C7D0F6304BAE /* NidraScript.swift */; };
 /* End PBXBuildFile section */
 
@@ -49,9 +52,11 @@
 		0157D62245947E5DF9FE4054 /* TimerSheet.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TimerSheet.swift; sourceTree = "<group>"; };
 		0EC93162C25DDA3963080C9B /* NightSky.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NightSky.swift; sourceTree = "<group>"; };
 		250FB9099833C7D0F6304BAE /* NidraScript.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NidraScript.swift; sourceTree = "<group>"; };
+		2D8EBACA815BD3F371E248AE /* MusicEngine.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MusicEngine.swift; sourceTree = "<group>"; };
 		3E554132910D5357EA2CAB2C /* ShuffleView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ShuffleView.swift; sourceTree = "<group>"; };
 		45C03A54B22538E4A1DE103C /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
 		4DFBFA83AD235AC77716F7EC /* Haptics.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Haptics.swift; sourceTree = "<group>"; };
+		4EB6F9D9AD3ECAAAC1D13770 /* MelodySpace.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MelodySpace.swift; sourceTree = "<group>"; };
 		509838676419C07CA82234CA /* Narrator.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Narrator.swift; sourceTree = "<group>"; };
 		50C9522DF403924C37826308 /* LaBerceuseTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LaBerceuseTests.swift; sourceTree = "<group>"; };
 		519E5B6100235E9384E3AA7E /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist; path = Info.plist; sourceTree = "<group>"; };
@@ -72,6 +77,7 @@
 		C17B1C923DCD6E3677D2CEFE /* DemoSeed.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DemoSeed.swift; sourceTree = "<group>"; };
 		C558752E907389FA7FA9110E /* LaBerceuse.app */ = {isa = PBXFileReference; includeInIndex = 0; lastKnownFileType = wrapper.application; path = LaBerceuse.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		CE7CD1A4DD2D8BD679EFA024 /* en */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = en; path = en.lproj/InfoPlist.strings; sourceTree = "<group>"; };
+		CEA472FF5B26AAFB3810E138 /* GenerativeMusic.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = GenerativeMusic.swift; sourceTree = "<group>"; };
 		D49EAFD4B6F749C018AB6A8D /* fr */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = fr; path = fr.lproj/InfoPlist.strings; sourceTree = "<group>"; };
 		D80F007243F2A22C9B74DB57 /* SoundscapeView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SoundscapeView.swift; sourceTree = "<group>"; };
 		EC2B9245067DBAAC8797ED05 /* HomeView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HomeView.swift; sourceTree = "<group>"; };
@@ -133,6 +139,7 @@
 				ABD2FF4CDE00FA4D50787130 /* BreathPattern.swift */,
 				B17AD76D43A5EE2E91BB9BBF /* CognitiveShuffle.swift */,
 				C17B1C923DCD6E3677D2CEFE /* DemoSeed.swift */,
+				CEA472FF5B26AAFB3810E138 /* GenerativeMusic.swift */,
 				250FB9099833C7D0F6304BAE /* NidraScript.swift */,
 				B713902942C4844C31C7B66F /* Persistence.swift */,
 				92F8FAFDA1B545B2A11B90D1 /* SleepTimerController.swift */,
@@ -172,6 +179,8 @@
 		C1005E5E68D3ABCF6095FBAF /* Audio */ = {
 			isa = PBXGroup;
 			children = (
+				4EB6F9D9AD3ECAAAC1D13770 /* MelodySpace.swift */,
+				2D8EBACA815BD3F371E248AE /* MusicEngine.swift */,
 				94F54748520754DCCC2DDAD5 /* SoundEngine.swift */,
 			);
 			path = Audio;
@@ -312,10 +321,13 @@
 				167F1440E66D41EE5D5576A9 /* BreathView.swift in Sources */,
 				0A4253400FB522D4173C20E6 /* CognitiveShuffle.swift in Sources */,
 				1F326AE1885C73562747C22C /* DemoSeed.swift in Sources */,
+				E119713E374E8490E6D9F2EF /* GenerativeMusic.swift in Sources */,
 				5CA2EC098AA072F23EE62E11 /* Haptics.swift in Sources */,
 				22BD73B56B4E8A50F13E4D11 /* HomeView.swift in Sources */,
 				52FAF1F0AD105243041B4D69 /* LaBerceuseApp.swift in Sources */,
 				69FF5D343A7F7E5FC96E2F9C /* Loc.swift in Sources */,
+				E5FAA0119D3A6EBD8B3C1F11 /* MelodySpace.swift in Sources */,
+				C7DDD8AF514DFA04E5D52FBC /* MusicEngine.swift in Sources */,
 				1D4B0B72BE875E91A7F6DC4E /* Narrator.swift in Sources */,
 				F693093A3F51C8EC0C4784B6 /* NidraScript.swift in Sources */,
 				5C7C1A6066051243803068EA /* NidraView.swift in Sources */,
@@ -410,7 +422,7 @@
 				CLANG_WARN__DUPLICATE_METHOD_MATCH = YES;
 				CODE_SIGN_STYLE = Automatic;
 				COPY_PHASE_STRIP = NO;
-				CURRENT_PROJECT_VERSION = 1;
+				CURRENT_PROJECT_VERSION = 4;
 				DEBUG_INFORMATION_FORMAT = dwarf;
 				DEVELOPMENT_TEAM = 9WZ66DZ69J;
 				ENABLE_STRICT_OBJC_MSGSEND = YES;
@@ -542,7 +554,7 @@
 				CLANG_WARN__DUPLICATE_METHOD_MATCH = YES;
 				CODE_SIGN_STYLE = Automatic;
 				COPY_PHASE_STRIP = NO;
-				CURRENT_PROJECT_VERSION = 1;
+				CURRENT_PROJECT_VERSION = 4;
 				DEBUG_INFORMATION_FORMAT = "dwarf-with-dsym";
 				DEVELOPMENT_TEAM = 9WZ66DZ69J;
 				ENABLE_NS_ASSERTIONS = NO;

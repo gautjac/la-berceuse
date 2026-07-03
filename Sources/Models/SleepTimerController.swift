@@ -10,6 +10,10 @@ public final class SleepTimerController: ObservableObject {
 
     @Published public private(set) var timer = SleepTimer(total: 0)
     @Published public private(set) var running = false
+    /// Increments each time a timer reaches silence. A monotonic signal (unlike
+    /// `timer.isFinished`, which flips back to false in the same tick when the
+    /// timer resets) so views — e.g. the nidra player — can react reliably.
+    @Published public private(set) var completions = 0
 
     private var ticker: AnyCancellable?
     private var lastTick = Date()
@@ -29,6 +33,7 @@ public final class SleepTimerController: ObservableObject {
         running = true
         lastTick = Date()
         SoundEngine.shared.masterMultiplier = 1
+        MusicEngine.shared.masterMultiplier = 1
         ticker = Timer.publish(every: 0.5, on: .main, in: .common)
             .autoconnect()
             .sink { [weak self] _ in self?.tick() }
@@ -39,7 +44,10 @@ public final class SleepTimerController: ObservableObject {
         ticker = nil
         running = false
         timer = SleepTimer(total: 0)
-        if resetVolume { SoundEngine.shared.masterMultiplier = 1 }
+        if resetVolume {
+            SoundEngine.shared.masterMultiplier = 1
+            MusicEngine.shared.masterMultiplier = 1
+        }
     }
 
     private func tick() {
@@ -47,9 +55,14 @@ public final class SleepTimerController: ObservableObject {
         let dt = now.timeIntervalSince(lastTick)
         lastTick = now
         timer = timer.advanced(by: dt)
+        // The same equal-power fade drives both the ambient layers and the
+        // generative music so they ebb to silence together.
         SoundEngine.shared.masterMultiplier = timer.volumeMultiplier
+        MusicEngine.shared.masterMultiplier = timer.volumeMultiplier
         if timer.isFinished {
+            completions += 1
             SoundEngine.shared.stopAll()
+            MusicEngine.shared.stop()
             cancel(resetVolume: true)
         }
     }

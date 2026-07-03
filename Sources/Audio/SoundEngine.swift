@@ -177,6 +177,16 @@ final class LayerGenerator: @unchecked Sendable {
     private var phase: [Double] = []        // drone partials
     private var wavePhase: Double = 0       // surf LFO
     private var dropPhase: Double = 0       // rain shimmer
+    // Motion state for the living weather layers (rain/wind/waves): two LFOs at
+    // different rates plus a slow random-walk so they sweep and drift instead of
+    // sitting static the moment they're turned on.
+    private var lfoA: Double = 0
+    private var lfoB: Double = 0
+    private var drift: Double = 0.5         // random-walk value (use varies by layer)
+    private var driftTarget: Double = 0.5
+    private var driftTimer: Double = 0
+    private var swellPeriod: Double = 12    // current wave swell length (s)
+    private var swellHeight: Double = 1     // current wave swell height
     // Music-box scheduler.
     private var mbTimer: Double = 0
     private var mbVoices: [(freq: Double, phase: Double, env: Double, decay: Double)] = []
@@ -188,6 +198,30 @@ final class LayerGenerator: @unchecked Sendable {
         if layer == .drone {
             phase = [0, 0, 0, 0]
         }
+    }
+
+    /// The broadband weather/noise layers are widened into stereo; the tonal
+    /// layers (drone, music box) stay mono-centred for a solid image.
+    private var isWide: Bool {
+        switch layer {
+        case .rain, .wind, .waves, .brownNoise, .pinkNoise: return true
+        case .drone, .musicBox: return false
+        }
+    }
+    // First-order all-pass decorrelation state for the right channel.
+    private var apX1 = 0.0, apY1 = 0.0, apX2 = 0.0, apY2 = 0.0
+
+    /// Phase-decorrelate a mono sample for the right channel — same spectrum,
+    /// different phase, so the layer images wide without changing its tone. Two
+    /// cascaded first-order all-passes with distinct coefficients.
+    @inline(__always) private func decorrelate(_ x: Double) -> Double {
+        let c1 = 0.72
+        let y1 = c1 * x + apX1 - c1 * apY1
+        apX1 = x; apY1 = y1
+        let c2 = -0.55
+        let y2 = c2 * y1 + apX2 - c2 * apY2
+        apX2 = y1; apY2 = y2
+        return y2
     }
 
     func render(frames: Int, gain: Float, into abl: UnsafeMutableAudioBufferListPointer) {
@@ -202,19 +236,34 @@ final class LayerGenerator: @unchecked Sendable {
         }
         let g = Double(gain)
         let dt = 1.0 / sampleRate
-        // Render mono then copy to all channels.
+        let wide = isWide
+        let n = abl.count
         for frame in 0..<frames {
             let s = sample(dt: dt) * g
-            let f = Float(s)
-            for buf in abl {
-                if let p = buf.mData?.assumingMemoryBound(to: Float.self) {
-                    p[frame] = f
-                }
+            let l = s
+            let r = wide ? decorrelate(s) : s
+            if n >= 2 {
+                abl[0].mData?.assumingMemoryBound(to: Float.self)[frame] = Float(l)
+                abl[1].mData?.assumingMemoryBound(to: Float.self)[frame] = Float(r)
+            } else if n == 1 {
+                abl[0].mData?.assumingMemoryBound(to: Float.self)[frame] = Float(l)
             }
         }
     }
 
     private func white() -> Double { Double.random(in: -1...1, using: &rng) }
+
+    /// Advance the slow random-walk `drift`: every `lo…hi` seconds it picks a new
+    /// target somewhere in `range` and glides toward it over a few seconds. This
+    /// is what keeps the weather layers from ever settling into a static loop.
+    private func updateDrift(dt: Double, every lo: Double, _ hi: Double, range: ClosedRange<Double>) {
+        driftTimer -= dt
+        if driftTimer <= 0 {
+            driftTimer = Double.random(in: lo...hi, using: &rng)
+            driftTarget = Double.random(in: range, using: &rng)
+        }
+        drift += (driftTarget - drift) * (dt / 2.5)   // ~2.5 s glide
+    }
 
     private func sample(dt: Double) -> Double {
         switch layer {
@@ -238,13 +287,19 @@ final class LayerGenerator: @unchecked Sendable {
             return pink * 0.11
 
         case .rain:
-            // Filtered noise hiss + sparse brighter "droplet" shimmer.
+            // Filtered noise hiss + sparse droplets, now alive: a slow ebb
+            // between a gentle patter and a heavier shower (two LFOs), plus a
+            // drifting low-pass cutoff so the rain "opens and closes".
+            lfoA += dt * 0.045                              // ~22 s breathing
+            lfoB += dt * 0.013                              // ~77 s heavier passes
+            let swell = 0.55 + 0.30 * sin(2 * .pi * lfoA) + 0.15 * sin(2 * .pi * lfoB)
+            updateDrift(dt: dt, every: 8, 18, range: 0.32...0.6)   // cutoff drift
             let n = white()
-            lp1 += (n - lp1) * 0.45      // soften
-            lp2 += (lp1 - lp2) * 0.45
-            var s = lp2 * 0.8
-            // Occasional bright droplet.
-            if Double.random(in: 0...1, using: &rng) < 0.0006 {
+            lp1 += (n - lp1) * drift
+            lp2 += (lp1 - lp2) * drift
+            var s = lp2 * (0.6 + 0.5 * swell)
+            // Droplet density rides the swell, so heavier passes patter more.
+            if Double.random(in: 0...1, using: &rng) < 0.0004 + 0.0010 * swell {
                 dropPhase = 1
             }
             if dropPhase > 0 {
@@ -252,25 +307,36 @@ final class LayerGenerator: @unchecked Sendable {
                 dropPhase *= 0.92
                 if dropPhase < 0.01 { dropPhase = 0 }
             }
-            return s * 0.6
+            return s * 0.6 * (0.7 + 0.4 * swell)
 
         case .wind:
-            // Low-passed noise whose cutoff/level is modulated by a slow LFO so
-            // it swells and ebbs like real wind.
-            wavePhase += dt * 0.08
-            let gust = 0.5 + 0.5 * sin(2 * .pi * wavePhase)
+            // Two gust LFOs at different rates, scaled by a slow random-walk in
+            // gust strength → gusts that vary in force and spacing rather than a
+            // fixed, repeating pulse.
+            lfoA += dt * 0.07
+            lfoB += dt * 0.017
+            updateDrift(dt: dt, every: 6, 14, range: 0.35...1.0)   // gust strength
+            let gust = max(0, 0.45 + 0.40 * sin(2 * .pi * lfoA) + 0.25 * sin(2 * .pi * lfoB)) * drift
             let n = white()
-            lp1 += (n - lp1) * (0.04 + 0.10 * gust)
-            return lp1 * (0.4 + 0.6 * gust) * 0.7
+            lp1 += (n - lp1) * (0.03 + 0.12 * gust)
+            return lp1 * (0.35 + 0.75 * gust) * 0.7
 
         case .waves:
-            // Brown-ish surf shaped by a slow swell envelope (~12 s period).
-            wavePhase += dt / 12.0
-            let swell = pow(0.5 + 0.5 * sin(2 * .pi * wavePhase), 2.0)
+            // Brown-ish surf, but every swell draws a fresh period and height, so
+            // the surf never repeats on a metronome; a slow tide drift sits under
+            // it for a longer ebb and flow.
+            wavePhase += dt / swellPeriod
+            if wavePhase >= 1 {
+                wavePhase -= 1
+                swellPeriod = Double.random(in: 9...16, using: &rng)
+                swellHeight = Double.random(in: 0.7...1.0, using: &rng)
+            }
+            updateDrift(dt: dt, every: 15, 30, range: 0.7...1.0)   // tide level
+            let swell = pow(0.5 + 0.5 * sin(2 * .pi * wavePhase), 2.0) * swellHeight * drift
             brown += white() * 0.02
             brown *= 0.997
             let surf = tanh(brown * 3.0)
-            return surf * swell * 0.7
+            return surf * swell * 0.8
 
         case .drone:
             // Warm low chord: root ~110 Hz (A2), fifth, octave, slightly detuned,
