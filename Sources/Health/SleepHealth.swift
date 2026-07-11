@@ -133,6 +133,42 @@ public final class SleepHealth: @unchecked Sendable {
         }
     }
 
+    /// Read the last `count` nights of sleep, one record per morning, for the
+    /// carnet de nuit. Returns [] when unavailable / not authorized / no data.
+    public func nights(last count: Int) async -> [NightRecord] {
+        guard isAvailable, let sleepType, count > 0 else { return [] }
+        let cal = Calendar.current
+        let start = cal.date(byAdding: .day, value: -(count + 1), to: Date()) ?? Date()
+        let predicate = HKQuery.predicateForSamples(withStart: start, end: Date(), options: [])
+        let asleepValues: Set<Int> = [
+            HKCategoryValueSleepAnalysis.asleepUnspecified.rawValue,
+            HKCategoryValueSleepAnalysis.asleepCore.rawValue,
+            HKCategoryValueSleepAnalysis.asleepDeep.rawValue,
+            HKCategoryValueSleepAnalysis.asleepREM.rawValue,
+        ]
+        return await withCheckedContinuation { (cont: CheckedContinuation<[NightRecord], Never>) in
+            let q = HKSampleQuery(sampleType: sleepType, predicate: predicate,
+                                  limit: HKObjectQueryNoLimit, sortDescriptors: nil) { _, samples, _ in
+                guard let cats = samples as? [HKCategorySample], !cats.isEmpty else {
+                    cont.resume(returning: [])
+                    return
+                }
+                // Bucket asleep time by the morning each segment ended toward.
+                var byMorning: [Date: TimeInterval] = [:]
+                for s in cats where asleepValues.contains(s.value) {
+                    let morning = cal.startOfDay(for: CarnetMath.nightMorning(for: s.startDate, calendar: cal))
+                    byMorning[morning, default: 0] += s.endDate.timeIntervalSince(s.startDate)
+                }
+                let records = byMorning
+                    .map { NightRecord(morning: $0.key, asleepHours: $0.value / 3600.0) }
+                    .sorted { $0.morning < $1.morning }
+                    .suffix(count)
+                cont.resume(returning: Array(records))
+            }
+            store.execute(q)
+        }
+    }
+
     /// Log a wind-down ritual that just ended as an `inBed` segment.
     public func logWindDown(start: Date, end: Date) async {
         guard isAvailable, let sleepType, end > start else { return }
@@ -149,6 +185,7 @@ public final class SleepHealth: @unchecked Sendable {
     public func requestHeartRateAuthorization() async -> Bool { false }
     public func latestHeartRate() async -> Double? { nil }
     public func lastNight() async -> SleepSummary? { nil }
+    public func nights(last count: Int) async -> [NightRecord] { [] }
     public func logWindDown(start: Date, end: Date) async {}
     #endif
 }

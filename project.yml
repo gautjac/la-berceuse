@@ -18,7 +18,7 @@ settings:
     MARKETING_VERSION: "1.0"
     # Bump on each device reinstall so iPadOS/iOS refreshes the cached home-screen
     # icon instead of keeping a stale (blank) slot from an earlier install.
-    CURRENT_PROJECT_VERSION: "4"
+    CURRENT_PROJECT_VERSION: "5"
     # Jac's paid Apple Developer team — must live in the BASE settings so it
     # propagates to every target and ./gen.sh keeps it.
     DEVELOPMENT_TEAM: "9WZ66DZ69J"
@@ -52,6 +52,28 @@ targets:
         # HealthKit will SILENTLY fail to authorize without this entitlement —
         # usage strings alone are NOT enough.
         com.apple.developer.healthkit: true
+    dependencies:
+      # Lock-screen / Dynamic Island sleep-timer countdown.
+      - target: LaBerceuseWidgets
+
+  LaBerceuseWidgets:
+    type: app-extension
+    platform: iOS
+    deploymentTarget: "17.0"
+    sources:
+      - path: Widgets
+      # The activity attributes are shared with the app target.
+      - path: Sources/Activity
+    settings:
+      base:
+        PRODUCT_BUNDLE_IDENTIFIER: app.atelier.laberceuse.widgets
+        PRODUCT_NAME: LaBerceuseWidgets
+        # Xcode merges this file's NSExtension dict into the generated plist.
+        GENERATE_INFOPLIST_FILE: YES
+        INFOPLIST_FILE: Widgets/Info.plist
+        INFOPLIST_KEY_CFBundleDisplayName: La Berceuse
+        SKIP_INSTALL: YES
+        TARGETED_DEVICE_FAMILY: "1,2"
 
   LaBerceuseTests:
     type: bundle.unit-test

@@ -9,7 +9,7 @@ struct LaBerceuseApp: App {
     init() {
         do {
             container = try ModelContainer(
-                for: SavedMix.self, RitualSession.self, Settings.self
+                for: SavedMix.self, RitualSession.self, Settings.self, SavedRitual.self
             )
         } catch {
             fatalError("Could not create ModelContainer: \(error)")

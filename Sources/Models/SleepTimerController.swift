@@ -1,5 +1,8 @@
 import Foundation
 import Combine
+#if canImport(ActivityKit)
+import ActivityKit
+#endif
 
 /// Drives the sleep timer at runtime: ticks the pure `SleepTimer` value, pushes
 /// the fade multiplier into `SoundEngine`, and stops everything at silence.
@@ -19,6 +22,10 @@ public final class SleepTimerController: ObservableObject {
     private var lastTick = Date()
     private let fadeSeconds: Double = 60
 
+    #if canImport(ActivityKit)
+    private var activity: Activity<SleepTimerAttributes>?
+    #endif
+
     private init() {}
 
     public var isActive: Bool { running && timer.isActive }
@@ -37,6 +44,7 @@ public final class SleepTimerController: ObservableObject {
         ticker = Timer.publish(every: 0.5, on: .main, in: .common)
             .autoconnect()
             .sink { [weak self] _ in self?.tick() }
+        startLiveActivity(endDate: Date().addingTimeInterval(Double(minutes) * 60))
     }
 
     public func cancel(resetVolume: Bool = true) {
@@ -48,6 +56,30 @@ public final class SleepTimerController: ObservableObject {
             SoundEngine.shared.masterMultiplier = 1
             MusicEngine.shared.masterMultiplier = 1
         }
+        endLiveActivity()
+    }
+
+    // MARK: - Live Activity (lock-screen / Dynamic Island countdown)
+
+    /// One request at start, one end at silence — the countdown itself renders
+    /// on the lock screen via `Text(timerInterval:)`, no per-tick updates.
+    private func startLiveActivity(endDate: Date) {
+        #if canImport(ActivityKit)
+        guard ActivityAuthorizationInfo().areActivitiesEnabled else { return }
+        endLiveActivity()
+        activity = try? Activity.request(
+            attributes: SleepTimerAttributes(),
+            content: .init(state: .init(endDate: endDate), staleDate: endDate)
+        )
+        #endif
+    }
+
+    private func endLiveActivity() {
+        #if canImport(ActivityKit)
+        guard let activity else { return }
+        self.activity = nil
+        Task { await activity.end(nil, dismissalPolicy: .immediate) }
+        #endif
     }
 
     private func tick() {

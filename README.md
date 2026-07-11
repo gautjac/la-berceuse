@@ -76,6 +76,31 @@ SwiftData, AVAudioEngine, HealthKit.
   everything together** — the spoken voice rides the same fade and the nidra winds
   down with the music and soundscapes when the timer reaches silence. A timer chip
   in the player arms it without leaving the session.
+- **Les rituels + le bouton « Dors ».** Chain the instruments into one-tap
+  sequences ("souffle 3 min → repos profond → sons avec minuterie") with a small
+  editor; a saved ritual can become the **« Dors » master button** on Home — one
+  tap and the night starts: settle-in breath, then sounds + generative music with
+  the timer armed, resting into Mode chevet. The player reuses the exact pacing
+  math of each instrument (orb, word stream, paced script) and logs one ritual
+  session for the carnet.
+- **Réveils nocturnes.** Between 1 and 5 a.m., Home leads with one giant, dim
+  card — two minutes of physiological sighs, then the cognitive shuffle, no
+  navigation, ending in the dark quiet of the chevet. An awake mind at 3 a.m.
+  gets a button, not a menu.
+- **Mode chevet.** A bedside resting state: faint serif clock, the night sky, the
+  timer if one is armed, nothing else. Screen stays awake, status bar hidden,
+  tap to leave. It's also where every ritual settles when its steps are done.
+- **Le carnet de nuit.** Tapping the sleep stat opens a quiet page connecting the
+  last 14 nights (HealthKit) with the rituals that preceded them: "Les soirs de
+  rituel, tu dors 32 min de plus", a soft sparkline, the current streak, your
+  most-practised ritual. Pure, unit-tested correlation math (`CarnetMath`);
+  observations, never a dashboard.
+- **Siri / Raccourcis.** « Dis Siri, bonne nuit avec La Berceuse » (or a bedtime
+  Focus automation) opens straight into the Dors flow via App Intents.
+- **Live Activity.** Arming the sleep timer puts a quiet countdown on the Lock
+  Screen / Dynamic Island (moon + remaining time, self-rendering
+  `Text(timerInterval:)` — no updates pushed while you drift off), in its own
+  widget-extension target.
 - **HealthKit.** Asks permission, shows last night's sleep as a gentle stat, and
   logs each wind-down ritual to Health as in-bed / mindful time. Fails gracefully
   when denied or unavailable.
@@ -110,7 +135,11 @@ circadian curve, the heart-rate nudge, and the complexity axis (richer harmony /
 voicing / activity, decoupled from intensity), and the melody's reverb/delay DSP
 (delay-line indexing, reverb stability + decay, echo tail), and the Écho /
 Réverbération controls (wet-level + feedback mapping, audible-tail response), and
-the widened complexity gap (full complexity flows densely; low→high spread) — 53 tests):
+the widened complexity gap (full complexity flows densely; low→high spread), the
+stereo richness DSP (equal-power pan, saturation, ping-pong + modulated stereo
+reverb + shimmer stability), and the rituals & carnet logic (plan ordering,
+durations, rescue hours, JSON round-trip, night assignment, ritual-gain and
+streak math) — 66 tests):
 
 ```bash
 xcodebuild -project LaBerceuse.xcodeproj -scheme LaBerceuse \
@@ -159,15 +188,21 @@ in the simulator.
 Sources/
   Util/      Loc.swift (FR/EN), Theme.swift, Haptics.swift
   Models/    BreathPattern, CognitiveShuffle, Soundscape (+ FadeMath/SleepTimer),
+             Ritual (RitualPlan/SavedRitual + Dors & rescue plans — pure),
+             Carnet (CarnetMath night-correlation insights — pure),
              GenerativeMusic (scales, chords, MusicDirector, AModMath — pure),
              NidraScript, Persistence (SwiftData), SleepTimerController, DemoSeed
   Audio/     SoundEngine.swift  (procedural AVAudioEngine mixer)
              MusicEngine.swift  (generative composer + breath-synced AM)
              MelodySpace.swift  (procedural echo + Freeverb-style reverb)
   Speech/    Narrator.swift     (AVSpeechSynthesizer)
-  Health/    SleepHealth.swift  (HealthKit)
+  Health/    SleepHealth.swift  (HealthKit: sleep, heart rate, 14-night carnet read)
+  Intents/   BonneNuitIntent.swift (Siri « Bonne nuit » → Dors flow)
+  Activity/  SleepTimerAttributes.swift (shared with the widget target)
   Views/     NightSky, RootView, HomeView, BreathView, SoundscapeView,
-             ShuffleView, NidraView, TimerSheet, SettingsView
+             ShuffleView, NidraView, TimerSheet, SettingsView,
+             RitualViews (player + chevet + editor), CarnetView
+Widgets/     LaBerceuseWidgets.swift (sleep-timer Live Activity), Info.plist
 Tests/       LaBerceuseTests.swift
 iOS/         Info.plist, LaBerceuse.entitlements, {fr,en}.lproj/InfoPlist.strings
 scripts/     gen-appicon.py  (opaque moon-over-indigo icon, no alpha)

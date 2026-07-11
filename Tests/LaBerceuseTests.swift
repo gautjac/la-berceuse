@@ -576,6 +576,100 @@ final class LaBerceuseTests: XCTestCase {
         XCTAssertLessThan(dry, 0.02, "no wet mix → essentially no tail")
         XCTAssertGreaterThan(wet, dry + 0.5, "turning up echo + reverb adds an audible tail")
     }
+
+    // MARK: - Rituals
+
+    func testRitualPlanSoundsStepAlwaysRunsLast() {
+        let plan = RitualPlan(name: "x", steps: [
+            RitualStep(kind: .sounds, minutes: 30),
+            RitualStep(kind: .breath, detail: "478", minutes: 3),
+            RitualStep(kind: .shuffle, minutes: 5),
+        ])
+        XCTAssertEqual(plan.steps.last?.kind, .sounds, "sounds hands off to the night — it must close the plan")
+        XCTAssertEqual(plan.steps.first?.kind, .breath)
+    }
+
+    func testRitualStepDurations() {
+        XCTAssertEqual(RitualStep(kind: .breath, detail: "478", minutes: 3).seconds, 180, accuracy: 0.001)
+        XCTAssertEqual(RitualStep(kind: .breath, minutes: 0).seconds, 30, accuracy: 0.001, "floors at 30 s")
+        let nidra = RitualStep(kind: .nidra, detail: NidraScript.all[0].id)
+        XCTAssertEqual(nidra.seconds, Double(NidraScript.all[0].minutes) * 60, accuracy: 0.001)
+        XCTAssertEqual(RitualStep(kind: .sounds, minutes: 45).seconds, 0, accuracy: 0.001, "sounds is untimed")
+    }
+
+    func testDorsPlanShape() {
+        let plan = RitualPlan.dors(breathPatternID: "coherent", timerMinutes: 45)
+        XCTAssertEqual(plan.steps.map(\.kind), [.breath, .sounds])
+        XCTAssertEqual(plan.steps[0].detail, "coherent")
+        XCTAssertEqual(plan.steps[1].minutes, 45, accuracy: 0.001)
+    }
+
+    func testRescueHours() {
+        XCTAssertFalse(RitualPlan.isRescueHour(0), "midnight is still bedtime, not a wake-up")
+        XCTAssertTrue(RitualPlan.isRescueHour(1))
+        XCTAssertTrue(RitualPlan.isRescueHour(3))
+        XCTAssertTrue(RitualPlan.isRescueHour(4))
+        XCTAssertFalse(RitualPlan.isRescueHour(5))
+        XCTAssertFalse(RitualPlan.isRescueHour(22))
+    }
+
+    func testRitualStepsRoundTripThroughJSON() {
+        let steps = [
+            RitualStep(kind: .breath, detail: "sigh", minutes: 2),
+            RitualStep(kind: .nidra, detail: "bodyscan10"),
+            RitualStep(kind: .sounds, minutes: 60),
+        ]
+        let data = try! JSONEncoder().encode(steps)
+        let back = try! JSONDecoder().decode([RitualStep].self, from: data)
+        XCTAssertEqual(back, steps)
+    }
+
+    // MARK: - Carnet de nuit
+
+    private func date(_ day: Int, hour: Int) -> Date {
+        var c = DateComponents()
+        c.year = 2026; c.month = 6; c.day = day; c.hour = hour
+        return Calendar.current.date(from: c)!
+    }
+
+    func testNightMorningAssignment() {
+        let cal = Calendar.current
+        // A 10 p.m. ritual belongs to the NEXT morning's night…
+        XCTAssertEqual(CarnetMath.nightMorning(for: date(10, hour: 22)),
+                       cal.startOfDay(for: date(11, hour: 0)))
+        // …a 3 a.m. rescue to the SAME morning.
+        XCTAssertEqual(CarnetMath.nightMorning(for: date(11, hour: 3)),
+                       cal.startOfDay(for: date(11, hour: 0)))
+    }
+
+    func testCarnetRitualGain() {
+        let cal = Calendar.current
+        // Ritual evenings (day 10 & 12) precede 8 h nights; plain nights get 7 h.
+        let nights = [11, 12, 13, 14].map { d in
+            NightRecord(morning: cal.startOfDay(for: date(d, hour: 0)),
+                        asleepHours: (d == 11 || d == 13) ? 8.0 : 7.0)
+        }
+        let sessions = [("breath", date(10, hour: 22)), ("nidra", date(12, hour: 23))]
+        let ins = CarnetMath.insights(nights: nights, sessions: sessions)
+        XCTAssertEqual(ins.nightCount, 4)
+        XCTAssertEqual(ins.ritualNightCount, 2)
+        XCTAssertEqual(ins.ritualGainMinutes, 60, accuracy: 0.001, "8 h ritual nights vs 7 h plain = +60 min")
+        XCTAssertEqual(ins.averageHours, 7.5, accuracy: 0.001)
+    }
+
+    func testCarnetStreakAndEmpty() {
+        XCTAssertEqual(CarnetMath.insights(nights: [], sessions: []).nightCount, 0)
+        let cal = Calendar.current
+        let nights = [12, 13, 14].map {
+            NightRecord(morning: cal.startOfDay(for: date($0, hour: 0)), asleepHours: 7)
+        }
+        // Rituals on the evenings before mornings 13 and 14 → streak of 2.
+        let sessions = [("ritual", date(12, hour: 22)), ("ritual", date(13, hour: 22))]
+        let ins = CarnetMath.insights(nights: nights, sessions: sessions)
+        XCTAssertEqual(ins.currentStreak, 2)
+        XCTAssertEqual(ins.favouriteKind, "ritual")
+        XCTAssertEqual(ins.ritualGainMinutes, 0, accuracy: 0.001, "same hours ⇒ no invented gain")
+    }
 }
 
 /// A seedable RNG so the generative-music tests are deterministic (the synth
