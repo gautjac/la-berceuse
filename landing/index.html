@@ -1,0 +1,576 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>La Berceuse — une berceuse pour l'esprit qui tourne</title>
+<meta name="description" content="Un instrument de sommeil iOS entièrement hors-ligne : souffle guidé, brouillage cognitif, sons vivants, musique générative, repos profond. Aucun compte, aucun suivi.">
+<meta property="og:title" content="La Berceuse">
+<meta property="og:description" content="Une berceuse pour l'esprit qui tourne. Entièrement hors-ligne.">
+<meta property="og:url" content="https://la-berceuse.netlify.app/">
+<meta property="og:image" content="https://la-berceuse.netlify.app/assets/share.png">
+<meta name="theme-color" content="#05050e">
+<link rel="icon" href="assets/icon.png">
+<link rel="apple-touch-icon" href="assets/icon.png">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Literata:ital,opsz,wght@0,7..72,300;0,7..72,400;0,7..72,500;1,7..72,300;1,7..72,400&family=Nunito:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+/* ————— La Berceuse — the page is one night ————— */
+:root{
+  --ground:#05050e;
+  --sky-low:#0a0a1c;
+  --indigo:#171536;
+  --night:#0f1229;
+  --panel:#12121d;
+  --line:#2a2a40;
+  --ink:#dbdbeb;        /* moonlight */
+  --mist:#a7acc4;       /* body on dark — ≥7:1 on ground */
+  --faint:#7a7f99;      /* meta only, large/short */
+  --moon:#f5c780;       /* the only warm thing on this page */
+  --moon-deep:#e69452;
+  --serif:'Literata', 'New York', Georgia, serif;
+  --round:'Nunito', -apple-system, 'SF Pro Rounded', sans-serif;
+  --z-sky:0; --z-content:1; --z-nav:10;
+}
+*{margin:0;padding:0;box-sizing:border-box}
+html{scroll-behavior:smooth}
+@media (prefers-reduced-motion: reduce){ html{scroll-behavior:auto} }
+body{
+  background:var(--ground);
+  color:var(--mist);
+  font-family:var(--round);
+  font-size:1.0625rem;
+  line-height:1.75;
+  -webkit-font-smoothing:antialiased;
+  overflow-x:hidden;
+}
+/* Bilingual: body carries lang-fr / lang-en; spans toggle. */
+.en{display:none}
+body.lang-en .en{display:inline}
+body.lang-en .fr{display:none}
+body.lang-en .en-block{display:block}
+.en-block{display:none}
+body.lang-en .fr-block{display:none}
+.fr-block{display:block}
+
+h1,h2,h3{font-family:var(--serif);font-weight:400;color:var(--ink);text-wrap:balance;letter-spacing:-0.01em}
+p{max-width:62ch;text-wrap:pretty}
+a{color:var(--ink)}
+::selection{background:rgba(245,199,128,.25)}
+
+/* ————— Sky ————— */
+#sky{position:fixed;inset:0;z-index:var(--z-sky);pointer-events:none}
+
+/* ————— Nav ————— */
+nav.top{
+  position:fixed;top:0;left:0;right:0;z-index:var(--z-nav);
+  display:flex;align-items:center;justify-content:space-between;
+  padding:14px clamp(18px,4vw,40px);
+  background:linear-gradient(to bottom, rgba(5,5,14,.92), rgba(5,5,14,0));
+}
+nav.top .mark{display:flex;align-items:center;gap:11px;text-decoration:none}
+nav.top .mark img{width:34px;height:34px;border-radius:8.5px}
+nav.top .mark span{font-family:var(--serif);font-size:1.1rem;color:var(--ink)}
+.lang-toggle{
+  display:flex;gap:2px;border:1px solid var(--line);border-radius:99px;padding:3px;
+  background:rgba(10,10,28,.6);backdrop-filter:blur(6px)
+}
+.lang-toggle button{
+  font-family:var(--round);font-size:.8rem;font-weight:700;letter-spacing:.02em;
+  background:none;border:0;color:var(--faint);padding:4px 12px;border-radius:99px;cursor:pointer
+}
+.lang-toggle button[aria-pressed="true"]{background:var(--indigo);color:var(--ink)}
+
+/* ————— Hero ————— */
+.hero{
+  position:relative;z-index:var(--z-content);
+  min-height:100svh;display:flex;flex-direction:column;justify-content:center;
+  padding:0 clamp(20px,6vw,72px);
+}
+.hero h1{
+  font-size:clamp(2.4rem,6.5vw,4.6rem);
+  line-height:1.12;font-weight:300;max-width:13ch;
+}
+.hero h1 em{font-style:italic;font-weight:300;color:var(--moon)}
+.hero .lede{margin-top:26px;font-size:clamp(1.05rem,1.6vw,1.25rem);max-width:44ch;color:var(--mist)}
+.hero .cta-row{margin-top:44px;display:flex;align-items:center;gap:22px;flex-wrap:wrap}
+.btn-moon{
+  display:inline-block;font-family:var(--round);font-weight:700;font-size:.98rem;
+  color:#241703;background:var(--moon);
+  padding:14px 26px;border-radius:99px;text-decoration:none;
+  transition:transform .5s cubic-bezier(.16,1,.3,1), box-shadow .5s cubic-bezier(.16,1,.3,1);
+  box-shadow:0 0 0 rgba(245,199,128,0);
+}
+.btn-moon:hover{transform:translateY(-2px);box-shadow:0 8px 40px rgba(245,199,128,.22)}
+.hero .quiet-note{font-size:.9rem;color:var(--faint)}
+.hero .down{
+  position:absolute;bottom:32px;left:clamp(20px,6vw,72px);
+  font-size:.85rem;color:var(--faint);text-decoration:none;letter-spacing:.04em;
+}
+.hero .down::after{content:"↓";display:inline-block;margin-left:8px;animation:sink 3.5s ease-in-out infinite}
+@keyframes sink{0%,100%{transform:translateY(0)}50%{transform:translateY(5px)}}
+@media (prefers-reduced-motion: reduce){.hero .down::after{animation:none}}
+
+/* ————— The night thread ————— */
+.night{position:relative;z-index:var(--z-content);padding:10vh clamp(20px,6vw,72px) 0;max-width:1080px;margin:0 auto}
+.night-intro{margin-bottom:12vh}
+.night-intro h2{font-size:clamp(1.7rem,3.4vw,2.5rem);font-weight:300;max-width:22ch}
+.moment{
+  position:relative;
+  padding:0 0 14vh clamp(58px,8vw,96px);
+  border-left:1px solid var(--line);
+  margin-left:6px;
+}
+.moment:last-of-type{padding-bottom:8vh}
+.moment .when{
+  position:absolute;left:-6px;top:.3em;transform:translateX(-100%);
+  padding-right:clamp(14px,2.5vw,26px);
+  font-family:var(--serif);font-style:italic;font-size:clamp(.95rem,1.6vw,1.15rem);
+  color:var(--moon);white-space:nowrap;
+}
+.moment::before{
+  content:"";position:absolute;left:-4px;top:.55em;width:7px;height:7px;border-radius:50%;
+  background:var(--moon);box-shadow:0 0 14px rgba(245,199,128,.55);
+}
+.moment h3{font-size:clamp(1.45rem,2.6vw,2rem);font-weight:400;margin-bottom:14px}
+.moment p{margin-bottom:12px}
+.moment .aside{font-size:.92rem;color:var(--faint)}
+.moment .app-word{font-family:var(--serif);font-style:italic;color:var(--ink)}
+
+/* Breathing orb (Le souffle) */
+.orb-stage{display:flex;align-items:center;gap:clamp(24px,5vw,60px);flex-wrap:wrap;margin:30px 0 8px}
+.orb{
+  position:relative;width:190px;height:190px;flex:0 0 auto;
+  display:flex;align-items:center;justify-content:center;
+}
+.orb .halo{
+  position:absolute;inset:0;border-radius:50%;
+  background:radial-gradient(circle, rgba(245,199,128,.5) 0%, rgba(230,148,82,.12) 55%, transparent 72%);
+  animation:breathe 11s ease-in-out infinite;
+}
+.orb .ring{
+  position:absolute;inset:24px;border-radius:50%;
+  border:1.5px solid rgba(245,199,128,.55);
+  animation:breathe 11s ease-in-out infinite;
+}
+@keyframes breathe{0%,100%{transform:scale(.48)}50%{transform:scale(1)}}
+.orb .phase{
+  position:relative;font-family:var(--serif);font-style:italic;
+  font-size:1.15rem;color:var(--ink);
+}
+@media (prefers-reduced-motion: reduce){
+  .orb .halo,.orb .ring{animation:pulse-soft 11s ease-in-out infinite}
+  @keyframes pulse-soft{0%,100%{opacity:.35}50%{opacity:1}}
+}
+.patterns{list-style:none;display:flex;flex-direction:column;gap:9px;font-size:.98rem}
+.patterns li strong{color:var(--ink);font-weight:600}
+
+/* Drifting shuffle words */
+.drift-stage{position:relative;height:150px;margin:26px 0 4px;max-width:560px}
+.drift-stage span.w{
+  position:absolute;font-family:var(--serif);font-style:italic;color:var(--ink);
+  opacity:0;animation:drift 14s linear infinite;font-size:1.25rem;white-space:nowrap;
+}
+@keyframes drift{
+  0%{opacity:0;transform:translateY(14px)}
+  12%,55%{opacity:.9;transform:translateY(0)}
+  70%,100%{opacity:0;transform:translateY(-16px)}
+}
+@media (prefers-reduced-motion: reduce){
+  .drift-stage span.w{animation:drift-fade 14s linear infinite}
+  @keyframes drift-fade{0%{opacity:0}12%,55%{opacity:.9}70%,100%{opacity:0}}
+}
+
+/* Living sound bars */
+.soundwave{display:flex;align-items:flex-end;gap:5px;height:64px;margin:28px 0 6px;max-width:420px}
+.soundwave i{
+  flex:1;background:linear-gradient(to top, rgba(122,127,153,.65), rgba(219,219,235,.5));
+  border-radius:3px;min-height:8%;
+  animation:sway 6s ease-in-out infinite;
+}
+.soundwave i.warm{background:linear-gradient(to top, rgba(230,148,82,.75), rgba(245,199,128,.7))}
+@keyframes sway{0%,100%{height:calc(12% + var(--h)*.4)}50%{height:calc(12% + var(--h))}}
+@media (prefers-reduced-motion: reduce){.soundwave i{animation:none;height:calc(12% + var(--h)*.7)}}
+
+/* Offline manifesto */
+.offline{
+  position:relative;z-index:var(--z-content);
+  margin:8vh auto;padding:clamp(48px,8vw,90px) clamp(20px,6vw,72px);
+  text-align:center;
+}
+.offline h2{font-size:clamp(2rem,5vw,3.4rem);font-weight:300}
+.offline .vows{
+  margin:38px auto 0;display:flex;justify-content:center;gap:clamp(18px,4vw,54px);flex-wrap:wrap;
+  font-size:1rem;color:var(--mist);
+}
+.offline .vows span{white-space:nowrap}
+.offline .vows .sep{color:var(--moon)}
+.offline p.small{margin:26px auto 0;font-size:.92rem;color:var(--faint);max-width:52ch}
+
+/* Screenshots */
+.gallery{position:relative;z-index:var(--z-content);padding:4vh 0 10vh;overflow-x:auto;scrollbar-width:none}
+.gallery::-webkit-scrollbar{display:none}
+.gallery .rail{display:flex;gap:clamp(16px,3vw,30px);padding:20px clamp(20px,6vw,72px);width:max-content}
+.shot{
+  flex:0 0 auto;width:min(240px,62vw);border-radius:34px;overflow:hidden;
+  border:1px solid var(--line);background:var(--panel);
+  box-shadow:0 24px 70px rgba(0,0,0,.55);
+}
+.shot img{display:block;width:100%;height:auto}
+.gallery-hint{position:relative;z-index:1;text-align:center;font-size:.85rem;color:var(--faint);padding-bottom:6vh}
+
+/* Footer */
+footer{
+  position:relative;z-index:var(--z-content);
+  border-top:1px solid var(--line);
+  padding:56px clamp(20px,6vw,72px) 46px;
+  background:linear-gradient(to bottom, transparent, rgba(10,10,28,.7));
+}
+.atelier{max-width:1080px;margin:0 auto 40px}
+.atelier .lead{font-family:var(--serif);font-style:italic;color:var(--faint);font-size:.98rem;margin-bottom:16px}
+.atelier-card{
+  display:flex;align-items:center;gap:14px;text-decoration:none;
+  border:1px solid var(--line);border-radius:18px;padding:14px 18px;margin-bottom:10px;
+  max-width:430px;transition:border-color .4s ease, background .4s ease;
+}
+.atelier-card:hover{border-color:rgba(245,199,128,.5);background:rgba(23,21,54,.5)}
+.atelier-card img{width:44px;height:44px;border-radius:11px}
+.atelier-card .name{display:block;color:var(--ink);font-weight:700;font-size:.98rem}
+.atelier-card .tag{display:block;color:var(--faint);font-size:.86rem}
+.atelier-card .arrow{margin-left:auto;color:var(--moon)}
+.foot-row{
+  max-width:1080px;margin:0 auto;display:flex;align-items:baseline;gap:26px;flex-wrap:wrap;
+  font-size:.9rem;color:var(--faint);
+}
+.foot-row .brand{font-family:var(--serif);color:var(--ink);font-size:1.05rem}
+.foot-row a{color:var(--faint);text-decoration:none;border-bottom:1px solid var(--line)}
+.foot-row a:hover{color:var(--ink)}
+.fineprint{max-width:1080px;margin:20px auto 0;font-size:.82rem;color:var(--faint)}
+
+@media (max-width:640px){
+  .moment{padding-left:24px;margin-left:82px}
+  .moment .when{padding-right:14px}
+}
+</style>
+</head>
+<body class="lang-fr">
+
+<canvas id="sky" aria-hidden="true"></canvas>
+
+<nav class="top">
+  <a class="mark" href="#">
+    <img src="assets/icon.png" alt="" width="34" height="34">
+    <span>La Berceuse</span>
+  </a>
+  <div class="lang-toggle" role="group" aria-label="Langue / Language">
+    <button id="btn-fr" aria-pressed="true" onclick="setLang('fr')">FR</button>
+    <button id="btn-en" aria-pressed="false" onclick="setLang('en')">EN</button>
+  </div>
+</nav>
+
+<header class="hero">
+  <h1>
+    <span class="fr">Une berceuse pour <em>l'esprit qui tourne</em>.</span>
+    <span class="en">A lullaby for <em>the racing mind</em>.</span>
+  </h1>
+  <p class="lede">
+    <span class="fr">Un instrument de sommeil pour iPhone et iPad. Souffle guidé, sons vivants, musique générative, repos profond. Et rien d'autre entre toi et la nuit.</span>
+    <span class="en">A sleep instrument for iPhone and iPad. Guided breath, living sound, generative music, deep rest. And nothing else between you and the night.</span>
+  </p>
+  <div class="cta-row">
+    <a class="btn-moon" href="#nuit">
+      <span class="fr">Commencer la nuit</span>
+      <span class="en">Begin the night</span>
+    </a>
+    <span class="quiet-note">
+      <span class="fr">Bientôt sur l'App Store · entièrement hors-ligne</span>
+      <span class="en">Coming to the App Store · fully offline</span>
+    </span>
+  </div>
+  <a class="down" href="#nuit"><span class="fr">Il est 22 h 47</span><span class="en">It's 10:47 p.m.</span></a>
+</header>
+
+<main class="night" id="nuit">
+  <div class="night-intro">
+    <h2>
+      <span class="fr">Voici comment une nuit se passe, avec elle.</span>
+      <span class="en">Here is how a night goes, with it.</span>
+    </h2>
+  </div>
+
+  <!-- 22:47 — Dors -->
+  <section class="moment">
+    <span class="when">22 h 47</span>
+    <h3><span class="fr">Tu appuies sur « Dors ».</span><span class="en">You tap “Sleep”.</span></h3>
+    <p>
+      <span class="fr">Un seul bouton lance toute la nuit : trois minutes de souffle pour déposer la journée, puis les sons s'installent et la minuterie s'arme. Aucune décision à prendre. Tu peux aussi le dire — <span class="app-word">« Dis Siri, bonne nuit »</span> — ou composer tes propres rituels, étape par étape.</span>
+      <span class="en">One button starts the whole night: three minutes of breathing to set the day down, then the sounds settle in and the timer arms itself. Nothing to decide. You can say it, too — <span class="app-word">“Hey Siri, good night”</span> — or compose your own rituals, step by step.</span>
+    </p>
+  </section>
+
+  <!-- 22:50 — Le souffle -->
+  <section class="moment">
+    <span class="when">22 h 50</span>
+    <h3><span class="fr">Le souffle ralentit. Essaie, là.</span><span class="en">The breath slows. Try it, right here.</span></h3>
+    <div class="orb-stage">
+      <div class="orb" aria-hidden="true">
+        <div class="halo"></div>
+        <div class="ring"></div>
+        <span class="phase" id="phase"><span class="fr">Inspire</span><span class="en">Breathe in</span></span>
+      </div>
+      <ul class="patterns">
+        <li><strong>4-7-8</strong> : <span class="fr">le plus efficace pour s'endormir</span><span class="en">the most effective for falling asleep</span></li>
+        <li><strong><span class="fr">Carré</span><span class="en">Box</span></strong> : <span class="fr">quatre temps égaux, comme la marée</span><span class="en">four equal counts, like the tide</span></li>
+        <li><strong><span class="fr">Cohérence 5,5</span><span class="en">Coherent 5.5</span></strong> : <span class="fr">celui que l'orbe respire ici</span><span class="en">the one this orb is breathing now</span></li>
+        <li><strong><span class="fr">Soupir physiologique</span><span class="en">Physiological sigh</span></strong> : <span class="fr">vide le stress d'un coup</span><span class="en">sheds stress fast</span></li>
+      </ul>
+    </div>
+    <p class="aside">
+      <span class="fr">Haptiques au rythme du souffle. La musique, plus tard, respirera à la même cadence.</span>
+      <span class="en">Haptics paced to your breath. Later, the music will breathe at the same cadence.</span>
+    </p>
+  </section>
+
+  <!-- 22:58 — Le brouillage -->
+  <section class="moment">
+    <span class="when">22 h 58</span>
+    <h3><span class="fr">Les pensées se brouillent — exprès.</span><span class="en">Your thoughts scatter — on purpose.</span></h3>
+    <p>
+      <span class="fr">Le brouillage cognitif du Dr Beaudoin : un lent défilé de mots neutres et sans lien, montrés en grand, murmurés par une voix douce. L'esprit qui essaie d'attraper chaque image, puis la lâche, glisse vers les micro-rêves de l'endormissement.</span>
+      <span class="en">Dr Beaudoin's cognitive shuffle: a slow stream of unrelated, neutral words, shown large, whispered by a soft voice. The mind reaches for each image, lets it go, and slides into the micro-dreams of sleep onset.</span>
+    </p>
+    <div class="drift-stage" aria-hidden="true">
+      <span class="w" style="left:2%;animation-delay:0s"><span class="fr">lanterne</span><span class="en">lantern</span></span>
+      <span class="w" style="left:38%;top:34%;animation-delay:3.5s"><span class="fr">rivière</span><span class="en">river</span></span>
+      <span class="w" style="left:66%;top:8%;animation-delay:7s"><span class="fr">galet</span><span class="en">pebble</span></span>
+      <span class="w" style="left:22%;top:62%;animation-delay:10.5s"><span class="fr">boussole</span><span class="en">compass</span></span>
+    </div>
+  </section>
+
+  <!-- 23:06 — Les sons & la musique -->
+  <section class="moment">
+    <span class="when">23 h 06</span>
+    <h3><span class="fr">Rien n'est enregistré. Tout est joué.</span><span class="en">Nothing is recorded. Everything is played.</span></h3>
+    <p>
+      <span class="fr">Pas un seul fichier audio dans l'app. La pluie, le vent, les vagues sont synthétisés en direct : la pluie s'ouvre et se referme, les rafales varient, aucune houle ne se répète jamais. Pas de boucle de dix minutes qui recommence : une météo qui vit.</span>
+      <span class="en">Not a single audio file in the app. The rain, the wind, the waves are synthesized live: the rain opens and closes, the gusts vary, no swell ever repeats. No ten-minute loop starting over: weather that lives.</span>
+    </p>
+    <div class="soundwave" aria-hidden="true">
+      <i style="--h:30%;animation-delay:0s"></i><i style="--h:55%;animation-delay:.4s"></i>
+      <i style="--h:40%;animation-delay:.9s"></i><i class="warm" style="--h:70%;animation-delay:.2s"></i>
+      <i style="--h:52%;animation-delay:1.3s"></i><i style="--h:34%;animation-delay:.6s"></i>
+      <i style="--h:64%;animation-delay:1.7s"></i><i style="--h:44%;animation-delay:.1s"></i>
+      <i class="warm" style="--h:58%;animation-delay:1s"></i><i style="--h:36%;animation-delay:1.5s"></i>
+      <i style="--h:60%;animation-delay:.3s"></i><i style="--h:28%;animation-delay:1.9s"></i>
+      <i style="--h:48%;animation-delay:.7s"></i><i style="--h:66%;animation-delay:1.2s"></i>
+      <i style="--h:38%;animation-delay:.5s"></i><i style="--h:54%;animation-delay:1.6s"></i>
+    </div>
+    <p>
+      <span class="fr">Par-dessus, une <span class="app-word">musique générative</span>, dans l'esprit de brain.fm ou d'Endel, mais entièrement sur l'appareil. Des nappes en vraie stéréo qui ondulent au rythme de ton souffle, une mélodie de harpe feutrée dans son écho, une pulsation douce qui s'accorde à l'heure, à la minuterie, même à ton cœur si tu le permets. Elle ne se répète jamais, et elle s'éteint avec toi.</span>
+      <span class="en">Above it, <span class="app-word">generative music</span>, in the spirit of brain.fm or Endel, but entirely on-device. True-stereo pads that swell with your breathing, a felted harp melody deep in its echo, a gentle pulse tuned to the hour, the timer, even your heart if you allow it. It never repeats, and it fades out with you.</span>
+    </p>
+  </section>
+
+  <!-- 23:14 — Le repos profond -->
+  <section class="moment">
+    <span class="when">23 h 14</span>
+    <h3><span class="fr">Ou bien : reposer sans dormir.</span><span class="en">Or: rest without sleeping.</span></h3>
+    <p>
+      <span class="fr">Des séances guidées de repos profond (NSDR, yoga-nidra), révélées ligne par ligne, à voix basse, pendant que la musique continue dessous. Dix ou vingt minutes de balayage du corps, au rythme d'une lecture du soir.</span>
+      <span class="en">Guided deep-rest sessions (NSDR, yoga-nidra), revealed line by line, in a low voice, while the music carries on underneath. Ten or twenty minutes of body scan, paced like a bedtime reading.</span>
+    </p>
+  </section>
+
+  <!-- 23:45 — La minuterie -->
+  <section class="moment">
+    <span class="when">23 h 45</span>
+    <h3><span class="fr">Tout s'éteint doucement, ensemble.</span><span class="en">Everything fades gently, together.</span></h3>
+    <p>
+      <span class="fr">Une seule minuterie gouverne la nuit : les sons, la musique et la voix suivent le même fondu jusqu'au silence. Sur l'écran verrouillé, un petit décompte discret. Sur la table de chevet, le <span class="app-word">mode chevet</span> : une horloge pâle, le ciel, rien d'autre.</span>
+      <span class="en">One timer governs the night: the sounds, the music and the voice ride the same fade to silence. On the Lock Screen, a small quiet countdown. On the nightstand, <span class="app-word">nightstand mode</span>: a pale clock, the sky, nothing else.</span>
+    </p>
+  </section>
+
+  <!-- 3:04 — Le réveil nocturne -->
+  <section class="moment">
+    <span class="when">3 h 04</span>
+    <h3><span class="fr">Réveillé en pleine nuit ? Un seul bouton.</span><span class="en">Awake in the middle of the night? One button.</span></h3>
+    <p>
+      <span class="fr">Entre 1 h et 5 h, l'app ne te montre pas de menu. Elle t'offre une seule grande carte, très sombre : deux minutes de soupirs physiologiques, puis le brouillage, jusqu'à ce que le sommeil revienne. Un esprit réveillé à 3 h n'a rien à décider.</span>
+      <span class="en">Between 1 and 5 a.m., the app doesn't show you a menu. It offers one large, very dim card: two minutes of physiological sighs, then the shuffle, until sleep returns. A mind awake at 3 a.m. has nothing to decide.</span>
+    </p>
+  </section>
+
+  <!-- 7:12 — Le carnet -->
+  <section class="moment">
+    <span class="when">7 h 12</span>
+    <h3><span class="fr">Le matin, la nuit se raconte.</span><span class="en">In the morning, the night tells its story.</span></h3>
+    <p>
+      <span class="fr">Le carnet de nuit relie tes rituels à ton sommeil mesuré par Santé : <span class="app-word">« Les soirs de rituel, tu dors 32 minutes de plus. »</span> Des observations douces, jamais un tableau de bord.</span>
+      <span class="en">The night journal connects your rituals to the sleep Health measured: <span class="app-word">“On ritual nights, you sleep 32 more minutes.”</span> Gentle observations, never a dashboard.</span>
+    </p>
+  </section>
+</main>
+
+<section class="offline">
+  <h2>
+    <span class="fr">Entièrement hors-ligne. <em style="color:var(--moon);font-style:italic">Vraiment.</em></span>
+    <span class="en">Fully offline. <em style="color:var(--moon);font-style:italic">Truly.</em></span>
+  </h2>
+  <div class="vows">
+    <span><span class="fr">aucun compte</span><span class="en">no account</span></span><span class="sep">·</span>
+    <span><span class="fr">aucun suivi</span><span class="en">no tracking</span></span><span class="sep">·</span>
+    <span><span class="fr">aucun réseau</span><span class="en">no network</span></span><span class="sep">·</span>
+    <span><span class="fr">aucune infolettre</span><span class="en">no newsletter</span></span>
+  </div>
+  <p class="small">
+    <span class="fr">Tes données Santé restent sur ton appareil. La musique est calculée sur ton téléphone, pas dans un nuage. L'app fonctionne en mode avion, au fond d'un chalet, pour toujours.</span>
+    <span class="en">Your Health data stays on your device. The music is computed on your phone, not in a cloud. The app works in airplane mode, deep in a cabin, forever.</span>
+  </p>
+</section>
+
+<div class="gallery" aria-label="Captures d'écran / Screenshots">
+  <div class="rail">
+    <figure class="shot"><img src="assets/01-accueil.png" alt="L'accueil de La Berceuse : la nuit dernière, la minuterie, les rituels / La Berceuse home: last night, the timer, the rituals" loading="lazy"></figure>
+    <figure class="shot"><img src="assets/02-souffle.png" alt="L'orbe du souffle en pleine expansion / The breathing orb mid-expansion" loading="lazy"></figure>
+    <figure class="shot"><img src="assets/03-sons.png" alt="Le mélangeur de sons, couche par couche / The soundscape mixer, layer by layer" loading="lazy"></figure>
+    <figure class="shot"><img src="assets/04-brouillage.png" alt="Le brouillage cognitif : un mot doux dans le noir / The cognitive shuffle: one soft word in the dark" loading="lazy"></figure>
+  </div>
+</div>
+<p class="gallery-hint"><span class="fr">Vrai noir OLED — pensée pour être tenue d'une main, dans le noir.</span><span class="en">True OLED black — made to be held one-handed, in the dark.</span></p>
+
+<footer>
+  <div class="atelier">
+    <p class="lead"><span class="fr">Aussi de l'atelier</span><span class="en">Also from the atelier</span></p>
+    <a class="atelier-card" href="https://astheure.netlify.app">
+      <img src="assets/astheure-icon.png" alt="" width="44" height="44" loading="lazy">
+      <span><span class="name">Astheure</span>
+      <span class="tag"><span class="fr">la radio du monde, en direct</span><span class="en">live radio from everywhere</span></span></span>
+      <span class="arrow" aria-hidden="true">→</span>
+    </a>
+    <a class="atelier-card" href="https://carrousel-app.netlify.app">
+      <img src="assets/carrousel-icon.png" alt="" width="44" height="44" loading="lazy">
+      <span><span class="name"><span class="fr">Carrousel</span><span class="en">Carousel</span></span>
+      <span class="tag"><span class="fr">un foyer calme pour l'iPad</span><span class="en">a calm hearth for your iPad</span></span></span>
+      <span class="arrow" aria-hidden="true">→</span>
+    </a>
+  </div>
+  <div class="foot-row">
+    <span class="brand">La Berceuse</span>
+    <a href="privacy.html"><span class="fr">Confidentialité</span><span class="en">Privacy</span></a>
+    <span><span class="fr">Bientôt sur l'App&nbsp;Store</span><span class="en">Coming to the App&nbsp;Store</span></span>
+  </div>
+  <p class="fineprint">
+    <span class="fr">Conçu au Canada par Jac Gautreau. © 2026. Bonne nuit.</span>
+    <span class="en">Made in Canada by Jac Gautreau. © 2026. Good night.</span>
+  </p>
+</footer>
+
+<script>
+(function(){
+  var TITLES = {
+    fr: "La Berceuse — une berceuse pour l'esprit qui tourne",
+    en: "La Berceuse — a lullaby for the racing mind"
+  };
+  window.setLang = function(l){
+    document.body.className = 'lang-' + l;
+    document.documentElement.lang = l;
+    document.title = TITLES[l];
+    document.getElementById('btn-fr').setAttribute('aria-pressed', l === 'fr');
+    document.getElementById('btn-en').setAttribute('aria-pressed', l === 'en');
+    try { localStorage.setItem('berceuse-lang', l); } catch(e){}
+  };
+  var saved = null;
+  try { saved = localStorage.getItem('berceuse-lang'); } catch(e){}
+  if (!saved) saved = (navigator.language || 'fr').slice(0,2) === 'en' ? 'en' : 'fr';
+  setLang(saved);
+
+  // Breathing-orb phase words — coherent 5.5 (5.5 s in, 5.5 s out), synced to
+  // the CSS animation's 11 s cycle.
+  var phase = document.getElementById('phase');
+  var inhale = true;
+  setInterval(function(){
+    inhale = !inhale;
+    phase.innerHTML = inhale
+      ? '<span class="fr">Inspire</span><span class="en">Breathe in</span>'
+      : '<span class="fr">Expire</span><span class="en">Breathe out</span>';
+  }, 5500);
+
+  // ——— The night sky: drifting stars + a low warm crescent moon. ———
+  var canvas = document.getElementById('sky');
+  var ctx = canvas.getContext('2d');
+  var stars = [], W = 0, H = 0, dpr = Math.min(window.devicePixelRatio || 1, 2);
+  var reduced = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+
+  function resize(){
+    W = window.innerWidth; H = window.innerHeight;
+    canvas.width = W * dpr; canvas.height = H * dpr;
+    canvas.style.width = W + 'px'; canvas.style.height = H + 'px';
+    ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+    stars = [];
+    var n = Math.floor(W * H / 9000);
+    for (var i = 0; i < n; i++){
+      stars.push({
+        x: Math.random() * W, y: Math.random() * H,
+        r: Math.random() * 1.15 + .25,
+        tw: Math.random() * Math.PI * 2,
+        sp: .06 + Math.random() * .18
+      });
+    }
+  }
+
+  function drawSky(t){
+    // Indigo-to-black gradient ground.
+    var g = ctx.createLinearGradient(0, 0, 0, H);
+    g.addColorStop(0, '#131130');
+    g.addColorStop(.45, '#0a0a1c');
+    g.addColorStop(1, '#05050e');
+    ctx.fillStyle = g;
+    ctx.fillRect(0, 0, W, H);
+
+    // Stars.
+    for (var i = 0; i < stars.length; i++){
+      var s = stars[i];
+      var a = .35 + .45 * (reduced ? .6 : (0.5 + 0.5 * Math.sin(s.tw + t * .0006)));
+      ctx.globalAlpha = a;
+      ctx.fillStyle = '#dbdbeb';
+      ctx.beginPath();
+      ctx.arc(s.x, s.y, s.r, 0, 7);
+      ctx.fill();
+      if (!reduced){
+        s.x -= s.sp * .12;
+        if (s.x < -2) s.x = W + 2;
+      }
+    }
+    ctx.globalAlpha = 1;
+
+    // A low warm crescent, top right — the same moon as the app icon.
+    var mx = W * .82, my = H * .24, R = Math.min(W, H) * .075;
+    var glow = ctx.createRadialGradient(mx, my, R * .4, mx, my, R * 3.4);
+    glow.addColorStop(0, 'rgba(230,148,82,.16)');
+    glow.addColorStop(1, 'rgba(230,148,82,0)');
+    ctx.fillStyle = glow;
+    ctx.fillRect(mx - R * 4, my - R * 4, R * 8, R * 8);
+    ctx.save();
+    ctx.beginPath(); ctx.arc(mx, my, R, 0, 7); ctx.clip();
+    ctx.fillStyle = '#f5c780';
+    ctx.beginPath(); ctx.arc(mx, my, R, 0, 7); ctx.fill();
+    ctx.globalCompositeOperation = 'destination-out';
+    ctx.beginPath(); ctx.arc(mx + R * .45, my - R * .12, R * .92, 0, 7); ctx.fill();
+    ctx.restore();
+  }
+
+  var raf;
+  function loop(t){ drawSky(t); raf = requestAnimationFrame(loop); }
+  window.addEventListener('resize', function(){ resize(); if (reduced) drawSky(0); });
+  resize();
+  if (reduced){ drawSky(0); } else { raf = requestAnimationFrame(loop); }
+  document.addEventListener('visibilitychange', function(){
+    if (reduced) return;
+    if (document.hidden) cancelAnimationFrame(raf); else raf = requestAnimationFrame(loop);
+  });
+})();
+</script>
+</body>
+</html>
