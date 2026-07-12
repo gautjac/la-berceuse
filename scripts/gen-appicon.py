@@ -106,7 +106,10 @@ def render_safe(px):
     return render(px)
 
 
-sizes = [40, 58, 60, 80, 87, 120, 167, 152, 76, 180, 1024]
+# NOTE: no iPad @1x slots — they only applied to iPads targeting iOS < 10 and
+# putting @2x-sized PNGs in them triggers asset-catalog warnings on every build
+# (our deployment target is iOS 17).
+sizes = [40, 58, 60, 80, 87, 120, 167, 152, 180, 1024]
 for s in sizes:
     render_safe(s).save(os.path.join(SET, f"icon-{s}.png"))
 
@@ -120,13 +123,9 @@ contents = {
         {"idiom": "iphone", "scale": "3x", "size": "40x40", "filename": "icon-120.png"},
         {"idiom": "iphone", "scale": "2x", "size": "60x60", "filename": "icon-120.png"},
         {"idiom": "iphone", "scale": "3x", "size": "60x60", "filename": "icon-180.png"},
-        {"idiom": "ipad", "scale": "1x", "size": "20x20", "filename": "icon-40.png"},
         {"idiom": "ipad", "scale": "2x", "size": "20x20", "filename": "icon-40.png"},
-        {"idiom": "ipad", "scale": "1x", "size": "29x29", "filename": "icon-58.png"},
         {"idiom": "ipad", "scale": "2x", "size": "29x29", "filename": "icon-58.png"},
-        {"idiom": "ipad", "scale": "1x", "size": "40x40", "filename": "icon-40.png"},
         {"idiom": "ipad", "scale": "2x", "size": "40x40", "filename": "icon-80.png"},
-        {"idiom": "ipad", "scale": "1x", "size": "76x76", "filename": "icon-76.png"},
         {"idiom": "ipad", "scale": "2x", "size": "76x76", "filename": "icon-152.png"},
         {"idiom": "ipad", "scale": "2x", "size": "83.5x83.5", "filename": "icon-167.png"},
         {"idiom": "ios-marketing", "scale": "1x", "size": "1024x1024", "filename": "icon-1024.png"},

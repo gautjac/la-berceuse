@@ -33,7 +33,9 @@ public final class LocManager: ObservableObject {
     public static let shared = LocManager()
 
     /// Persisted under the shared Atelier key. Synced with `@AppStorage` views.
-    public static let storageKey = "atelier_lang"
+    /// `nonisolated`: an immutable Sendable constant, referenced by the free
+    /// `t()` helper outside the main actor (a Swift 6 error otherwise).
+    nonisolated public static let storageKey = "atelier_lang"
 
     @Published public var lang: Lang {
         didSet {
