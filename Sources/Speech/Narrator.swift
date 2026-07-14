@@ -35,6 +35,9 @@ public final class Narrator: NSObject, ObservableObject {
     public func speak(_ text: String, lang: Lang,
                       rate: Float? = nil, pitch: Float? = nil, volume: Float = 0.7) {
         guard !text.isEmpty else { return }
+        // Screenshot rig: voice loading can stall a fresh simulator (the EN
+        // voice on iPad hangs the main actor), so demo runs can silence it.
+        guard !ProcessInfo.processInfo.arguments.contains("-demoNoSpeech") else { return }
         let d = UserDefaults.standard
         let storedRate  = (d.object(forKey: Self.rateKey)  as? Double) ?? Self.defaultRate
         let storedPitch = (d.object(forKey: Self.pitchKey) as? Double) ?? Self.defaultPitch

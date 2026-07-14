@@ -1,0 +1,5 @@
+# Clean URLs for the App Store Connect form fields
+/privacy          /privacy.html    200
+/confidentialite  /privacy.html    200
+/support          /support.html    200
+/aide             /support.html    200

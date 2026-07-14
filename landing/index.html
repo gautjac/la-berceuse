@@ -14,7 +14,7 @@
 <link rel="apple-touch-icon" href="assets/icon.png">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Literata:ital,opsz,wght@0,7..72,300;0,7..72,400;0,7..72,500;1,7..72,300;1,7..72,400&family=Nunito:wght@400;500;600;700&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Literata:ital,opsz,wght@0,7..72,300;0,7..72,400;0,7..72,500;1,7..72,300;1,7..72,400&family=Bricolage+Grotesque:opsz,wght@12..96,400;12..96,500;12..96,600;12..96,700&display=swap" rel="stylesheet">
 <style>
 /* ————— La Berceuse — the page is one night ————— */
 :root{
@@ -23,14 +23,15 @@
   --indigo:#171536;
   --night:#0f1229;
   --panel:#12121d;
-  --line:#2a2a40;
+  --line:#28304a;
   --ink:#dbdbeb;        /* moonlight */
   --mist:#a7acc4;       /* body on dark — ≥7:1 on ground */
   --faint:#7a7f99;      /* meta only, large/short */
   --moon:#f5c780;       /* the only warm thing on this page */
   --moon-deep:#e69452;
   --serif:'Literata', 'New York', Georgia, serif;
-  --round:'Nunito', -apple-system, 'SF Pro Rounded', sans-serif;
+  --round:'Bricolage Grotesque', -apple-system, 'SF Pro Rounded', sans-serif;
+  --blue:#2b4a78;        /* bleu de travail — the atelier's cool layer */
   --z-sky:0; --z-content:1; --z-nav:10;
 }
 *{margin:0;padding:0;box-sizing:border-box}
@@ -80,7 +81,7 @@ nav.top .mark span{font-family:var(--serif);font-size:1.1rem;color:var(--ink)}
   font-family:var(--round);font-size:.8rem;font-weight:700;letter-spacing:.02em;
   background:none;border:0;color:var(--faint);padding:4px 12px;border-radius:99px;cursor:pointer
 }
-.lang-toggle button[aria-pressed="true"]{background:var(--indigo);color:var(--ink)}
+.lang-toggle button[aria-pressed="true"]{background:var(--blue);color:#fff}
 
 /* ————— Hero ————— */
 .hero{
@@ -88,6 +89,13 @@ nav.top .mark span{font-family:var(--serif);font-size:1.1rem;color:var(--ink)}
   min-height:100svh;display:flex;flex-direction:column;justify-content:center;
   padding:0 clamp(20px,6vw,72px);
 }
+.atelier-eyebrow{
+  display:inline-flex;align-items:center;gap:9px;margin-bottom:26px;align-self:flex-start;
+  font-family:var(--round);font-weight:600;font-size:.86rem;letter-spacing:.01em;
+  color:var(--faint);text-decoration:none;opacity:.9;
+}
+.atelier-eyebrow img{opacity:.7;display:block}
+.atelier-eyebrow:hover{color:var(--ink)}
 .hero h1{
   font-size:clamp(2.4rem,6.5vw,4.6rem);
   line-height:1.12;font-weight:300;max-width:13ch;
@@ -246,6 +254,7 @@ footer{
 .foot-row .brand{font-family:var(--serif);color:var(--ink);font-size:1.05rem}
 .foot-row a{color:var(--faint);text-decoration:none;border-bottom:1px solid var(--line)}
 .foot-row a:hover{color:var(--ink)}
+.foot-row a.maker{border-bottom:0}
 .fineprint{max-width:1080px;margin:20px auto 0;font-size:.82rem;color:var(--faint)}
 
 @media (max-width:640px){
@@ -270,6 +279,10 @@ footer{
 </nav>
 
 <header class="hero">
+  <a class="atelier-eyebrow" href="https://atelier-jac.netlify.app">
+    <img src="assets/brand/atelier-mark-white.svg" alt="" width="17" height="17">
+    <span class="fr">Une appli de L’Atelier</span><span class="en">An app from L’Atelier</span>
+  </a>
   <h1>
     <span class="fr">Une berceuse pour <em>l'esprit qui tourne</em>.</span>
     <span class="en">A lullaby for <em>the racing mind</em>.</span>
@@ -442,7 +455,10 @@ footer{
 
 <footer>
   <div class="atelier">
-    <p class="lead"><span class="fr">Aussi de l'atelier</span><span class="en">Also from the atelier</span></p>
+    <p class="lead" style="display:flex;align-items:center;gap:9px">
+      <img src="assets/brand/atelier-mark-white.svg" alt="" width="15" height="15" style="opacity:.55">
+      <span class="fr">Aussi de l'atelier</span><span class="en">Also from the atelier</span>
+    </p>
     <a class="atelier-card" href="https://astheure.netlify.app">
       <img src="assets/astheure-icon.png" alt="" width="44" height="44" loading="lazy">
       <span><span class="name">Astheure</span>
@@ -457,13 +473,15 @@ footer{
     </a>
   </div>
   <div class="foot-row">
-    <span class="brand">La Berceuse</span>
+    <a class="maker" href="https://atelier-jac.netlify.app" aria-label="L’Atelier">
+      <img src="assets/brand/atelier-lockup-white.svg" alt="L’Atelier" height="30" style="display:block;opacity:.85">
+    </a>
     <a href="privacy.html"><span class="fr">Confidentialité</span><span class="en">Privacy</span></a>
     <span><span class="fr">Bientôt sur l'App&nbsp;Store</span><span class="en">Coming to the App&nbsp;Store</span></span>
   </div>
   <p class="fineprint">
-    <span class="fr">Conçu au Canada par Jac Gautreau. © 2026. Bonne nuit.</span>
-    <span class="en">Made in Canada by Jac Gautreau. © 2026. Good night.</span>
+    <span class="fr">La Berceuse est un atelier de Jac Gautreau, au Canada. © 2026. Bonne nuit.</span>
+    <span class="en">La Berceuse is an atelier by Jac Gautreau, in Canada. © 2026. Good night.</span>
   </p>
 </footer>
 

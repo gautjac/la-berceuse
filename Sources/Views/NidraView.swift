@@ -39,7 +39,11 @@ struct NidraListView: View {
         }
         .onAppear {
             if ProcessInfo.processInfo.arguments.contains("-demoNidra") {
-                selected = NidraScript.bodyScan10
+                // Presenting a cover during the initial render silently fails;
+                // give the hierarchy a beat first (same as -demoTimer on Home).
+                DispatchQueue.main.asyncAfter(deadline: .now() + 0.4) {
+                    selected = NidraScript.bodyScan10
+                }
             }
         }
     }

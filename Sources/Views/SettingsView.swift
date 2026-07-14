@@ -133,6 +133,20 @@ struct SettingsView: View {
                                "La Berceuse — fully offline. Sleep well."))
                         .font(.quietRounded(11)).foregroundStyle(Theme.mutedFar)
                         .padding(.top, 8)
+
+                    // The atelier signature — the house équerre, quiet as a
+                    // colophon. Links out to the family's hub site.
+                    Link(destination: URL(string: "https://atelier-jac.netlify.app")!) {
+                        HStack(spacing: 9) {
+                            Image("AtelierMark")
+                                .resizable().scaledToFit()
+                                .frame(width: 15, height: 15)
+                            Text(loc.t("Une appli de L'Atelier", "An app from L'Atelier"))
+                                .font(.quietRounded(11, .medium))
+                        }
+                        .foregroundStyle(Theme.mutedFar)
+                    }
+                    .padding(.top, 2)
                 }
                 .padding(20)
             }
